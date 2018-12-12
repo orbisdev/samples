@@ -1,9 +1,3 @@
-/*
- *	debugnet library sample for PlayStation 4 
- *	Copyright (C) 2010,2016 Antonio Jose Ramos Marquez (aka bigboss) @psxdev on twitter
- *  Repository https://github.com/psxdev/ps4link
- */
-
 
 #include <stdio.h>
 #include <stdlib.h>
