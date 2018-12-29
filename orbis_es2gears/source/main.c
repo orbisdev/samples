@@ -11,7 +11,8 @@
 #include <modplayer.h>
 #include <ps4link.h>
 #include <debugnet.h>
-#include <piglet.h>
+
+#include <orbisGl.h>
 #include <unistd.h>
 
 Orbis2dConfig *conf;
@@ -28,9 +29,6 @@ typedef struct OrbisGlobalConf
 }OrbisGlobalConf;
 
 OrbisGlobalConf *myConf;
-
-#define RENDER_WIDTH  1920
-#define RENDER_HEIGHT 1080
 
 static EGLDisplay s_display = EGL_NO_DISPLAY;
 static EGLSurface s_surface = EGL_NO_SURFACE;
@@ -540,6 +538,34 @@ err:
 	return false;
 }
 
+////
+bool initAppGl()
+{
+	int ret;
+	ret=orbisGlInit(ATTR_ORBISGL_WIDTH,ATTR_ORBISGL_HEIGHT);
+	if(ret>0)
+	{
+			glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+			ret=glGetError();
+			if(ret)
+			{
+				debugNetPrintf(ERROR,"[ORBISGLPERF] glViewport failed: 0x%08X\n",ret);
+				return false;
+			}
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			ret=glGetError();
+			if(ret)
+			{
+				debugNetPrintf(ERROR,"[ORBISGLPERF] glClearColor failed: 0x%08X\n",ret);
+				return false;
+			}
+			return true;
+	}
+	return false;
+}
+
+
+
 /// main loop for gears
 int frame = 0;
 static bool main_loop2(void) {
@@ -695,7 +721,7 @@ int main(int argc, char *argv[])
 		goto err;
 	}
 
-	if(!create_context(RENDER_WIDTH, RENDER_HEIGHT)) 
+	if(!create_context(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT)) 
 	{
 		debugNetPrintf(ERROR,"[ORBIS_GL] Unable to create context.\n");
 		goto err;
@@ -718,7 +744,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	glViewport(0, 0, RENDER_WIDTH, RENDER_HEIGHT);
+	glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 	ret = glGetError();
 	if(ret)
 	{

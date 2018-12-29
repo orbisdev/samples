@@ -35,8 +35,8 @@
  * Jul 13, 2010
  */
 
-#define GL_GLEXT_PROTOTYPES
-#define EGL_EGLEXT_PROTOTYPES
+/*#define GL_GLEXT_PROTOTYPES
+#define EGL_EGLEXT_PROTOTYPES*/
 
 #define _GNU_SOURCE
 
@@ -49,7 +49,7 @@
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-//#include "eglut.h"
+#include <orbisGl.h>
 #include <debugnet.h>
 
 #define STRIPS_PER_TOOTH 7
@@ -748,7 +748,7 @@ test(int argc, char *argv[])
    /* Initialize the gears */
    gears_init();
    
-   gears_reshape(1920, 1080);
+   gears_reshape(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 
    //eglutMainLoop();
 
