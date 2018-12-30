@@ -14,5 +14,5 @@ target ?= ps4_elf
 TargetFile=homebrew.elf
 
 include $(Ps4Sdk)/make/ps4sdk.mk
-LinkerFlags+=-ldebugnet -lps4link -lelfloader -lSceNet_stub -lorbisGl -lorbisFile -lScePigletv2VSH_stub -lSceSystemService_stub
+LinkerFlags+=-ldebugnet -lps4link -lorbisFile -lelfloader -lorbisKeyboard -lorbisGl -lorbisPad -lorbisAudio -lmod -lSceNet_stub -lScePigletv2VSH_stub -lSceSystemService_stub -lSceUserService_stub -lScePad_stub -lSceAudioOut_stub -lSceIme_stub -lSceSysmodule_stub
 

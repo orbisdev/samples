@@ -101,15 +101,15 @@ static GLfloat ProjectionMatrix[16];
 /** The direction of the directional light for the scene */
 static const GLfloat LightSourcePosition[4] = { 5.0, 5.0, 10.0, 1.0};
 
-/** 
+/**
  * Fills a gear vertex.
- * 
+ *
  * @param v the vertex to fill
  * @param x the x coordinate
  * @param y the y coordinate
  * @param z the z coortinate
  * @param n pointer to the normal table 
- * 
+ *
  * @return the operation error code
  */
 static GearVertex *
@@ -127,13 +127,13 @@ vert(GearVertex *v, GLfloat x, GLfloat y, GLfloat z, GLfloat n[3])
 
 /**
  *  Create a gear wheel.
- * 
+ *
  *  @param inner_radius radius of hole at center
  *  @param outer_radius radius at center of teeth
  *  @param width width of gear
  *  @param teeth number of teeth
  *  @param tooth_depth depth of tooth
- *  
+ *
  *  @return pointer to the constructed struct gear
  */
 static struct gear *
@@ -176,7 +176,7 @@ create_gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
       s[2] = sin(i * 2.0 * M_PI / teeth + da * 2);  c[2] = cos(i * 2.0 * M_PI / teeth + da * 2);
       s[3] = sin(i * 2.0 * M_PI / teeth + da * 3);  c[3] = cos(i * 2.0 * M_PI / teeth + da * 3);
       s[4] = sin(i * 2.0 * M_PI / teeth + da * 4);  c[4] = cos(i * 2.0 * M_PI / teeth + da * 4);
-      
+
       /*
       sincos(i * 2.0 * M_PI / teeth, &s[0], &c[0]);
       sincos(i * 2.0 * M_PI / teeth + da, &s[1], &c[1]);
@@ -284,11 +284,11 @@ create_gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
    return gear;
 }
 
-/** 
+/*
  * Multiplies two 4x4 matrices.
- * 
+ *
  * The result is stored in matrix m.
- * 
+ *
  * @param m the first matrix to multiply
  * @param n the second matrix to multiply
  */
@@ -311,9 +311,9 @@ multiply(GLfloat *m, const GLfloat *n)
    memcpy(m, &tmp, sizeof tmp);
 }
 
-/** 
+/*
  * Rotates a 4x4 matrix.
- * 
+ *
  * @param[in,out] m the matrix to rotate
  * @param angle the angle to rotate
  * @param x the x component of the direction to rotate to
@@ -324,10 +324,9 @@ static void
 rotate(GLfloat *m, GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
    double s, c;
-/*sincos(angle, &s, &c);*/
    s = sin(angle);
    c = cos(angle);
-   
+
    GLfloat r[16] = {
       x * x * (1 - c) + c,     y * x * (1 - c) + z * s, x * z * (1 - c) - y * s, 0,
       x * y * (1 - c) - z * s, y * y * (1 - c) + c,     y * z * (1 - c) + x * s, 0, 
@@ -355,9 +354,9 @@ translate(GLfloat *m, GLfloat x, GLfloat y, GLfloat z)
    multiply(m, t);
 }
 
-/** 
+/**
  * Creates an identity 4x4 matrix.
- * 
+ *
  * @param m the matrix make an identity matrix
  */
 static void
@@ -373,7 +372,7 @@ identity(GLfloat *m)
    memcpy(m, t, sizeof(t));
 }
 
-/** 
+/**
  * Transposes a 4x4 matrix.
  *
  * @param m the matrix to transpose
@@ -417,9 +416,9 @@ invert(GLfloat *m)
    multiply(m, t);
 }
 
-/** 
+/**
  * Calculate a perspective projection transformation.
- * 
+ *
  * @param m the matrix to save the transformation in
  * @param fovy the field of view in the y direction
  * @param aspect the view aspect ratio
@@ -484,7 +483,7 @@ draw_gear(struct gear *gear, GLfloat *transform,
    glUniformMatrix4fv(ModelViewProjectionMatrix_location, 1, GL_FALSE,
                       model_view_projection);
 
-   /* 
+   /*
     * Create and set the NormalMatrix. It's the inverse transpose of the
     * ModelView matrix.
     */
@@ -519,7 +518,7 @@ draw_gear(struct gear *gear, GLfloat *transform,
    glDisableVertexAttribArray(0);
 }
 
-/** 
+/**
  * Draws the gears.
  */
 void
@@ -544,12 +543,11 @@ gears_draw(void)
    draw_gear(gear1, transform, -3.0, -2.0, angle,             red  );
    draw_gear(gear2, transform,  3.1, -2.0, -2 * angle - 9.0,  green);
    draw_gear(gear3, transform, -3.1,  4.2, -2 * angle - 25.0, blue );
-   // debugNetPrintf(INFO,"[ORBIS_GL] Draw the gears\n");
 }
 
-/** 
+/**
  * Handles a new window size or exposure.
- * 
+ *
  * @param width the window width
  * @param height the window height
  */
@@ -563,35 +561,36 @@ gears_reshape(int width, int height)
    glViewport(0, 0, (GLint) width, (GLint) height);
 }
 
-/** 
+/**
  * Handles special eglut events.
- * 
+ *
  * @param special the event to handle.
  */
-/*static void
+void
 gears_special(int special)
 {
    switch (special) {
-      case EGLUT_KEY_LEFT:
+      case 0: //EGLUT_KEY_LEFT:
          view_rot[1] += 5.0;
          break;
-      case EGLUT_KEY_RIGHT:
+      case 1: //EGLUT_KEY_RIGHT:
          view_rot[1] -= 5.0;
          break;
-      case EGLUT_KEY_UP:
+      case 2: //EGLUT_KEY_UP:
          view_rot[0] += 5.0;
          break;
-      case EGLUT_KEY_DOWN:
+      case 3: //EGLUT_KEY_DOWN:
          view_rot[0] -= 5.0;
          break;
    }
-}*/
+}
 
+// hack (no time)
 static int frames = 0;
+
 void
-gears_idle(int unused)
+gears_idle(int *flag)
 {
-   //static int frames = 0;
    static double tRot0 = -1.0, tRate0 = -1.0;
    double dt;
    double t = 0.005; // XXX eglutGet(EGLUT_ELAPSED_TIME) / 1000.0;
@@ -601,15 +600,16 @@ gears_idle(int unused)
    dt = t - tRot0;
    tRot0 = t;
 
-// hack (no time)
-    dt = frames;
+   // hack (no time)
+   dt = frames;
 
    /* advance rotation for next frame */
    angle += 70.0 * dt;  /* 70 degrees per second */
    if (angle > 3600.0)
       angle -= 3600.0;
 
-debugNetPrintf(ERROR,"angle %3.1f %d\n", angle, frames);
+   if (frames%1000 == 0)
+      debugNetPrintf(INFO,"angle %3.1f %d\n", angle, frames);
 
    //eglutPostRedisplay();
    frames++;
@@ -698,9 +698,9 @@ gears_init(void)
 
    glLinkProgram(program);
    int ret = glGetError();
-	if (ret) {
-		debugNetPrintf(ERROR,"[ORBIS_GL] glLinkProgram() failed: 0x%08X\n", ret);
-	}
+   if (ret) {
+     debugNetPrintf(ERROR,"[ORBIS_GL] glLinkProgram() failed: 0x%08X\n", ret);
+   }
 
    glGetProgramInfoLog(program, sizeof msg, NULL, msg);
    debugNetPrintf(INFO,"info: %s\n", msg);
@@ -709,9 +709,9 @@ gears_init(void)
    debugNetPrintf(INFO,"glUseProgram\n");
    glUseProgram(program);
    ret = glGetError();
-	if (ret) {
-		debugNetPrintf(ERROR,"[ORBIS_GL] glUseProgram failed: 0x%08X\n", ret);
-	}
+   if (ret) {
+     debugNetPrintf(ERROR,"[ORBIS_GL] glUseProgram failed: 0x%08X\n", ret);
+   }
 
    /* Get the locations of the uniforms so we can access them */
    ModelViewProjectionMatrix_location = glGetUniformLocation(program, "ModelViewProjectionMatrix");
@@ -730,16 +730,16 @@ debugNetPrintf(INFO,"[ORBIS_GL] making gears\n");
 }
 
 int
-test(int argc, char *argv[])
+es2gears_init(int argc, char *argv[])
 {
-   /* Initialize the window 
+   /* Initialize the window
    eglutInitWindowSize(300, 300);
    eglutInitAPIMask(EGLUT_OPENGL_ES2_BIT);
    eglutInit(argc, argv);*/
 
    //eglutCreateWindow("es2gears");
 
-   /* Set up eglut callback functions 
+   /* Set up eglut callback functions
    eglutIdleFunc(gears_idle);
    eglutReshapeFunc(gears_reshape);
    eglutDisplayFunc(gears_draw);
@@ -747,10 +747,9 @@ test(int argc, char *argv[])
 
    /* Initialize the gears */
    gears_init();
-   
+
    gears_reshape(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 
    //eglutMainLoop();
-
    return 0;
 }
