@@ -126,10 +126,16 @@ render(void)
 }
 
 
-/* new window size or exposure */
+/**
+ * Handles a new window size or exposure.
+ *
+ * @param width the window width
+ * @param height the window height
+ */
 static void
 reshape(int width, int height)
 {
+   /* Set the viewport */
    glViewport(0, 0, (GLint) width, (GLint) height);
 }
 

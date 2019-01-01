@@ -1,6 +1,6 @@
 /*
  * es2tri liborbisGl sample
- * ---------------------------
+ * -------------------------
  *
  * This is a liborbisGl port of es2tri, from mesa/demos package:
  * https://github.com/freedesktop/mesa-demos/blob/master/src/egl/opengles2/es2tri.c
