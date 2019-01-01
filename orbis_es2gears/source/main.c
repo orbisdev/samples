@@ -6,7 +6,7 @@
  * https://github.com/freedesktop/mesa-demos/blob/master/src/egl/opengles2/es2gears.c
  *
  * whole EGL setup/cleanup is internally managed by liborbisGL;
- * whole OpenGL ES 2.0 part in e2gears.c is basically left untouched (we have to replace GLUT, here not available);
+ * whole OpenGL ES 2.0 part in es2gears.c is basically left untouched (we have to replace GLUT, here not available);
  * main render loop calls 3 gears_functions: draw, move and eventually update rotations by controller;
  * all timing functions are actually removed, using framecount (hugly hack) to get animation computed and rendered;
  * includes playing of .mod files and controller input;
@@ -38,175 +38,175 @@ OrbisPadConfig *confPad;
 
 typedef struct OrbisGlobalConf
 {
-	Orbis2dConfig *conf;
-	OrbisPadConfig *confPad;
-	OrbisAudioConfig *confAudio;
-	OrbisKeyboardConfig *confKeyboard;
-	ps4LinkConfiguration *confLink;
-	int orbisLinkFlag;
+    Orbis2dConfig *conf;
+    OrbisPadConfig *confPad;
+    OrbisAudioConfig *confAudio;
+    OrbisKeyboardConfig *confKeyboard;
+    ps4LinkConfiguration *confLink;
+    int orbisLinkFlag;
 }OrbisGlobalConf;
 
 OrbisGlobalConf *myConf;
 
 void updateController()
 {
-	int ret;
-	unsigned int buttons=0;
-	ret=orbisPadUpdate();
-	if(ret==0)
-	{
-		if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"Combo L2R2 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L2|ORBISPAD_R2);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R1) )
-		{
-			debugNetPrintf(DEBUG,"Combo L1R1 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L1|ORBISPAD_R1);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L1|ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"Combo L1R2 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L1|ORBISPAD_R2);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R1) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R1) )
-		{
-			debugNetPrintf(DEBUG,"Combo L2R1 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L2|ORBISPAD_R1);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
-		{
-			debugNetPrintf(DEBUG,"Up pressed\n");
-			gears_special(2);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
-		{
-			debugNetPrintf(DEBUG,"Down pressed\n");
-			gears_special(3);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
-		{
-			debugNetPrintf(DEBUG,"Right pressed\n");
-			gears_special(1);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
-		{
-			debugNetPrintf(DEBUG,"Left pressed\n");
-			gears_special(0);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
-		{
-			debugNetPrintf(DEBUG,"Triangle pressed exit\n");
-			flag=0;
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
-		{
-			debugNetPrintf(DEBUG,"Circle pressed\n");
-			orbisAudioResume(0);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_CROSS))
-		{
-			debugNetPrintf(DEBUG,"Cross pressed rand color\n");
-			//orbisAudioStop();
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_SQUARE))
-		{
-			debugNetPrintf(DEBUG,"Square pressed\n");
-			orbisAudioPause(0);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1))
-		{
-			debugNetPrintf(DEBUG,"L1 pressed\n");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L2))
-		{
-			debugNetPrintf(DEBUG,"L2 pressed\n");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_R1))
-		{
-			debugNetPrintf(DEBUG,"R1 pressed\n");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"R2 pressed\n");
-		}
-	}
+    int ret;
+    unsigned int buttons=0;
+    ret=orbisPadUpdate();
+    if(ret==0)
+    {
+        if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"Combo L2R2 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L2|ORBISPAD_R2);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R1) )
+        {
+            debugNetPrintf(DEBUG,"Combo L1R1 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L1|ORBISPAD_R1);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L1|ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"Combo L1R2 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L1|ORBISPAD_R2);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R1) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R1) )
+        {
+            debugNetPrintf(DEBUG,"Combo L2R1 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L2|ORBISPAD_R1);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
+        {
+            debugNetPrintf(DEBUG,"Up pressed\n");
+            pad_special(2);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
+        {
+            debugNetPrintf(DEBUG,"Down pressed\n");
+            pad_special(3);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
+        {
+            debugNetPrintf(DEBUG,"Right pressed\n");
+            pad_special(1);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
+        {
+            debugNetPrintf(DEBUG,"Left pressed\n");
+            pad_special(0);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
+        {
+            debugNetPrintf(DEBUG,"Triangle pressed exit\n");
+            flag=0;
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
+        {
+            debugNetPrintf(DEBUG,"Circle pressed\n");
+            orbisAudioResume(0);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_CROSS))
+        {
+            debugNetPrintf(DEBUG,"Cross pressed rand color\n");
+            //orbisAudioStop();
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_SQUARE))
+        {
+            debugNetPrintf(DEBUG,"Square pressed\n");
+            orbisAudioPause(0);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1))
+        {
+            debugNetPrintf(DEBUG,"L1 pressed\n");
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L2))
+        {
+            debugNetPrintf(DEBUG,"L2 pressed\n");
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_R1))
+        {
+            debugNetPrintf(DEBUG,"R1 pressed\n");
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"R2 pressed\n");
+        }
+    }
 }
 
 
 void finishApp()
 {
-	orbisAudioFinish();
-	orbisKeyboardFinish();
-	orbisGlFinish();
-	orbisPadFinish();
-	orbisFileFinish();
-	ps4LinkFinish();
+    orbisAudioFinish();
+    orbisKeyboardFinish();
+    orbisGlFinish();
+    orbisPadFinish();
+    orbisFileFinish();
+    ps4LinkFinish();
 }
 
 
 static bool initAppGl()
 {
-	int ret;
-	ret=orbisGlInit(ATTR_ORBISGL_WIDTH,ATTR_ORBISGL_HEIGHT);
-	if(ret>0)
-	{
-			glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
-			ret=glGetError();
-			if(ret)
-			{
-				debugNetPrintf(ERROR,"glViewport failed: 0x%08X\n",ret);
-				return false;
-			}
-			glClearColor(0.0f, 0.0f, 1.0f, 1.0f); //blue RGBA
-			ret=glGetError();
-			if(ret)
-			{
-				debugNetPrintf(ERROR,"glClearColor failed: 0x%08X\n",ret);
-				return false;
-			}
-			return true;
-	}
-	return false;
+    int ret;
+    ret=orbisGlInit(ATTR_ORBISGL_WIDTH,ATTR_ORBISGL_HEIGHT);
+    if(ret>0)
+    {
+        glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+        ret=glGetError();
+        if(ret)
+        {
+            debugNetPrintf(ERROR,"glViewport failed: 0x%08X\n",ret);
+            return false;
+        }
+        glClearColor(0.0f, 0.0f, 1.0f, 1.0f); //blue RGBA
+        ret=glGetError();
+        if(ret)
+        {
+            debugNetPrintf(ERROR,"glClearColor failed: 0x%08X\n",ret);
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 
 bool initApp()
 {
-	int ret;
-	sceSystemServiceHideSplashScreen();
-	//more library initialiazation here pad,filebroser,audio,keyboard, etc
-	//....
-	orbisFileInit();
-	ret=orbisPadInitWithConf(myConf->confPad);
-	if(ret)
-	{
-		confPad=orbisPadGetConf();
-		ret=orbisAudioInitWithConf(myConf->confAudio);
-		if(ret==1)
-		{
-			ret=orbisKeyboardInitWithConf(myConf->confKeyboard);
-			if(ret!=1)
-				return false;
-		}
-	}
-	else
-	{
-		return false;
-	}
-	if(!initAppGl())
-		return false;
+    int ret;
+    sceSystemServiceHideSplashScreen();
+    //more library initialiazation here pad,filebroser,audio,keyboard, etc
+    //....
+    orbisFileInit();
+    ret=orbisPadInitWithConf(myConf->confPad);
+    if(ret)
+    {
+        confPad=orbisPadGetConf();
+        ret=orbisAudioInitWithConf(myConf->confAudio);
+        if(ret==1)
+        {
+            ret=orbisKeyboardInitWithConf(myConf->confKeyboard);
+            if(ret!=1)
+                return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    if(!initAppGl())
+        return false;
 
-	return true;
+    return true;
 }
 
 
@@ -214,78 +214,78 @@ bool initApp()
 int frame = 0;
 static bool main_loop(void)
 {
-	int ret;
+    int ret;
 
-	while (flag)
-	{
-		updateController();
+    while (flag)
+    {
+        updateController();
 
-	    glClear(GL_COLOR_BUFFER_BIT);
-		ret = glGetError();
-		if (ret) {
-			debugNetPrintf(ERROR,"[ORBIS_GL] glClear failed: 0x%08X\n", ret);
-			goto err;
-		}
+        glClear(GL_COLOR_BUFFER_BIT);
+        ret = glGetError();
+        if (ret) {
+            debugNetPrintf(ERROR,"[ORBIS_GL] glClear failed: 0x%08X\n", ret);
+            goto err;
+        }
 
-		/// draw
-		gears_draw();
+        /// draw
+        render();
 
-		// animate
-		gears_idle(&flag);
+        // animate
+        gears_idle();
 
-	    // flip frame
+        // flip frame
         orbisGlSwapBuffers();
-	}
-	return true;
+    }
+    return true;
 
 err:
-	return false;
+    return false;
 }
 
 
 int main(int argc, char *argv[])
 {
-	int ret;
+    int ret;
 
-	uintptr_t intptr=0;
-	sscanf(argv[1],"%p",&intptr);
-	myConf=(OrbisGlobalConf *)intptr;
-	ret=ps4LinkInitWithConf(myConf->confLink);
-	if(!ret)
-	{
-		ps4LinkFinish();
-		return 0;
-	}
-	debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis\n");
-	sleep(1);
+    uintptr_t intptr=0;
+    sscanf(argv[1],"%p",&intptr);
+    myConf=(OrbisGlobalConf *)intptr;
+    ret=ps4LinkInitWithConf(myConf->confLink);
+    if(!ret)
+    {
+        ps4LinkFinish();
+        return 0;
+    }
+    debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis\n");
+    sleep(1);
 
-	// init libraries
-	flag=initApp();
-	
-	Mod_Init(0);
+    // init libraries
+    flag=initApp();
+
+    Mod_Init(0);
     ret = Mod_Load("host0:main.mod");
-	if(ret)
-	    Mod_Play();
+    if(ret)
+        Mod_Play();
 
-	orbisAudioResume(0);
+    orbisAudioResume(0);
 
-    // e2gears: build shaders, setup initial state, etc.
-    es2gears_init();
+    // build shaders, setup initial state, etc.
+    es2sample_init();
 
     // enter main render loop
-	if (!main_loop())
-	{
-		debugNetPrintf(ERROR,"[ORBIS_GL] Main loop stopped.\n");
-		goto err;
-	}
+    if (!main_loop())
+    {
+        debugNetPrintf(ERROR,"[ORBIS_GL] Main loop stopped.\n");
+        goto err;
+    }
 
-	err:
+    err:
 
-	orbisAudioPause(0);
-	Mod_End();
+    orbisAudioPause(0);
+    Mod_End();
 
-	// finish libraries
-	finishApp();
+    // finish libraries
+    finishApp();
 
-	exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
