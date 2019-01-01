@@ -522,7 +522,7 @@ draw_gear(struct gear *gear, GLfloat *transform,
  * Draws the gears.
  */
 void
-gears_draw(void)
+render(void)
 {
    const static GLfloat red[4] = { 0.8, 0.1, 0.0, 1.0 };
    const static GLfloat green[4] = { 0.0, 0.8, 0.2, 1.0 };
@@ -552,7 +552,7 @@ gears_draw(void)
  * @param height the window height
  */
 void
-gears_reshape(int width, int height)
+reshape(int width, int height)
 {
    /* Update the projection matrix */
    perspective(ProjectionMatrix, 60.0, width / (float)height, 1.0, 1024.0);
@@ -561,35 +561,12 @@ gears_reshape(int width, int height)
    glViewport(0, 0, (GLint) width, (GLint) height);
 }
 
-/**
- * Handles special eglut events.
- *
- * @param special the event to handle.
- */
-void
-gears_special(int special)
-{
-   switch (special) {
-      case 0: //EGLUT_KEY_LEFT:
-         view_rot[1] += 5.0;
-         break;
-      case 1: //EGLUT_KEY_RIGHT:
-         view_rot[1] -= 5.0;
-         break;
-      case 2: //EGLUT_KEY_UP:
-         view_rot[0] += 5.0;
-         break;
-      case 3: //EGLUT_KEY_DOWN:
-         view_rot[0] -= 5.0;
-         break;
-   }
-}
 
 // hack (no time)
 static int frames = 0;
 
 void
-gears_idle(int *flag)
+gears_idle(void)
 {
    static double tRot0 = -1.0, tRate0 = -1.0;
    double dt;
@@ -729,8 +706,34 @@ debugNetPrintf(INFO,"[ORBIS_GL] making gears\n");
    gear3 = create_gear(1.3, 2.0, 0.5, 10, 0.7);
 }
 
+
+/**
+ * Handles special eglut events.
+ *
+ * @param special the event to handle.
+ */
+void
+pad_special(int special)
+{
+   switch (special) {
+      case 0: //EGLUT_KEY_LEFT:
+         view_rot[1] += 5.0;
+         break;
+      case 1: //EGLUT_KEY_RIGHT:
+         view_rot[1] -= 5.0;
+         break;
+      case 2: //EGLUT_KEY_UP:
+         view_rot[0] += 5.0;
+         break;
+      case 3: //EGLUT_KEY_DOWN:
+         view_rot[0] -= 5.0;
+         break;
+   }
+}
+
+
 int
-es2gears_init(int argc, char *argv[])
+es2sample_init(int argc, char *argv[])
 {
    /* Initialize the window
    eglutInitWindowSize(300, 300);
@@ -748,7 +751,7 @@ es2gears_init(int argc, char *argv[])
    /* Initialize the gears */
    gears_init();
 
-   gears_reshape(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+   reshape(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 
    //eglutMainLoop();
    return 0;

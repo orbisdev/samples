@@ -6,7 +6,7 @@
  * https://github.com/freedesktop/mesa-demos/blob/master/src/egl/opengles2/es2tri.c
  *
  * whole EGL setup/cleanup is internally managed by liborbisGL;
- * whole OpenGL ES 2.0 part in e2gears.c is basically left untouched (we have to replace GLUT, here not available);
+ * whole OpenGL ES 2.0 part in es2tri.c is basically left untouched (we have to replace GLUT, here not available);
  * main render loop calls 2 functions: draw and eventually update rotations by controller;
  * includes playing of .mod files and controller input;
  * main skeleton results in a very basic and clean code.
@@ -85,22 +85,22 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
         {
             debugNetPrintf(DEBUG,"Up pressed\n");
-            tri_special(2);
+            pad_special(2);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
         {
             debugNetPrintf(DEBUG,"Down pressed\n");
-            tri_special(3);
+            pad_special(3);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
         {
             debugNetPrintf(DEBUG,"Right pressed\n");
-            tri_special(1);
+            pad_special(1);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
         {
             debugNetPrintf(DEBUG,"Left pressed\n");
-            tri_special(0);
+            pad_special(0);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
         {
@@ -159,21 +159,21 @@ static bool initAppGl()
     ret=orbisGlInit(ATTR_ORBISGL_WIDTH,ATTR_ORBISGL_HEIGHT);
     if(ret>0)
     {
-            glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
-            ret=glGetError();
-            if(ret)
-            {
-                debugNetPrintf(ERROR,"glViewport failed: 0x%08X\n",ret);
-                return false;
-            }
-            glClearColor(0.0f, 0.0f, 1.0f, 1.0f); //blue RGBA
-            ret=glGetError();
-            if(ret)
-            {
-                debugNetPrintf(ERROR,"glClearColor failed: 0x%08X\n",ret);
-                return false;
-            }
-            return true;
+        glViewport(0, 0, ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+        ret=glGetError();
+        if(ret)
+        {
+            debugNetPrintf(ERROR,"glViewport failed: 0x%08X\n",ret);
+            return false;
+        }
+        glClearColor(0.0f, 0.0f, 1.0f, 1.0f); //blue RGBA
+        ret=glGetError();
+        if(ret)
+        {
+            debugNetPrintf(ERROR,"glClearColor failed: 0x%08X\n",ret);
+            return false;
+        }
+        return true;
     }
     return false;
 }
@@ -227,7 +227,7 @@ static bool main_loop(void)
         }
 
         /// draw
-        tri_draw();
+        render();
 
         // flip frame
         orbisGlSwapBuffers();
@@ -265,8 +265,8 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
-    // e2gears: build shaders, setup initial state, etc.
-    es2tri_init();
+    // build shaders, setup initial state, etc.
+    es2sample_init();
 
     // enter main render loop
     if (!main_loop())
