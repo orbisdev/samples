@@ -90,7 +90,7 @@ mul_matrix(GLfloat *prod, const GLfloat *a, const GLfloat *b)
 
 
 void
-tri_draw(void)
+render(void)
 {
    static const GLfloat verts[3][2] = {
       { -1, -1 },
@@ -126,10 +126,16 @@ tri_draw(void)
 }
 
 
-/* new window size or exposure */
+/**
+ * Handles a new window size or exposure.
+ *
+ * @param width the window width
+ * @param height the window height
+ */
 static void
 reshape(int width, int height)
 {
+   /* Set the viewport */
    glViewport(0, 0, (GLint) width, (GLint) height);
 }
 
@@ -219,7 +225,7 @@ init(void)
 
 
 void
-tri_special(int special)
+pad_special(int special)
 {
    switch (special) {
       case 0: //_KEY_LEFT:
@@ -239,7 +245,7 @@ tri_special(int special)
 
 
 int
-es2tri_init(int argc, char *argv[])
+es2sample_init(int argc, char *argv[])
 {
     init();
 

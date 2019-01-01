@@ -1,12 +1,12 @@
 /*
- * es2tri liborbisGl sample
- * -------------------------
+ * es2shaders liborbisGl sample
+ * -----------------------------
  *
- * This is a liborbisGl port of es2tri, from mesa/demos package:
- * https://github.com/freedesktop/mesa-demos/blob/master/src/egl/opengles2/es2tri.c
+ * This is a liborbisGl port of an OpenGL ES 2.0 sample, from:
+ * https://github.com/leokwu/OpenGLES-sample/blob/master/egl.c
  *
  * whole EGL setup/cleanup is internally managed by liborbisGL;
- * whole OpenGL ES 2.0 part in es2tri.c is basically left untouched (we have to replace GLUT, here not available);
+ * whole OpenGL ES 2.0 part in egl.c is basically left untouched (we have to replace GLUT, here not available);
  * main render loop calls 2 functions: draw and eventually update rotations by controller;
  * includes playing of .mod files and controller input;
  * main skeleton results in a very basic and clean code.
