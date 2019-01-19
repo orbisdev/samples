@@ -366,7 +366,6 @@ void ApplyOrtho(float maxX, float maxY)
 void on_GLES2_Size(int view_w, int view_h)
 {
     glViewport(0, 0, view_w, view_h);
-    printf("glViewport %d %d\n", view_w, view_h);
     ApplyOrtho(2.0f, 3.0f);
 }
 //------------------------------------------------------------------------------
@@ -438,16 +437,12 @@ void on_GLES2_Update(float timeStep_sec)
 
     // generate water plane
     CreateWaterPlane(20, 20, &g_TimeElapsed);
-    //printf("%f\n", g_TimeElapsed);
-   // on_GLES2_Size(800, 480);
 }
 //------------------------------------------------------------------------------
 void on_GLES2_Render()
 {
     // clear scene background and depth buffer
     glClearColor(0.55f, 0.96f, 0.96f, 1.0f);
-    /* clear the color buffer */
-	//glClearColor(0.2, 0.0, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
     // get vertex and color slots
