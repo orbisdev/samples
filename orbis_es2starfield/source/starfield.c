@@ -179,7 +179,6 @@ GLuint BuildProgram(const char* pVShader,const char* pFShader)
 void on_GLES2_Size(int view_w, int view_h)
 {
     glViewport(0, 0, view_w, view_h);
-    //printf("glViewport %d %d\n", view_w, view_h);
     ApplyOrtho(2.0f, 3.0f);
 }
 //------------------------------------------------------------------------------
