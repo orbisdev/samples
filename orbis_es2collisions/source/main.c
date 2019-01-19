@@ -223,6 +223,9 @@ static bool main_loop(void)
             goto err;
         }
 
+        /// update
+        on_GLES2_Update((float)frame++);
+
         /// draw
         on_GLES2_Render();
 
