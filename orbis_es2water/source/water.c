@@ -429,7 +429,7 @@ void on_GLES2_Final()
 void on_GLES2_Update(float timeStep_sec)
 {
     // calculate elapsed time
-    g_TimeElapsed += 0.02f;//timeStep_sec;
+    g_TimeElapsed += 0.007f;//timeStep_sec;
 
     // do reduce elapsed time? (to make animation cycle infinite)
     if (g_TimeElapsed >= 100000.0f)
