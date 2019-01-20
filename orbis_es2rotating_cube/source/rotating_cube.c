@@ -280,9 +280,9 @@ void on_GLES2_Init(int view_w, int view_h)
 
 	simpleProgram = BuildProgram(simpleVertexShader, simpleFragmentShader);
 	glUseProgram(simpleProgram);
-    
-    // set viewport
-    on_GLES2_Size(view_w, view_h);
+
+	// set viewport
+	on_GLES2_Size(view_w, view_h);
 }
 //------------------------------------------------------------------------------
 void on_GLES2_Final()
@@ -298,8 +298,8 @@ float iXangle = 0, iYangle = 0, iZangle = 0;
 //------------------------------------------------------------------------------
 void on_GLES2_Update(float timeStep_sec)
 {
-    timeStep_sec = 0.005;
-    //printf("%f, %f, %f, %f\n", timeStep_sec, iXangle, iYangle, iZangle);
+	timeStep_sec = 0.005;
+	//printf("%f, %f, %f, %f\n", timeStep_sec, iXangle, iYangle, iZangle);
 	iXangle += 0.9*timeStep_sec * 30;
 	iYangle += 0.7*timeStep_sec * 30;
 	iZangle += 0.5*timeStep_sec * 30;
@@ -320,6 +320,7 @@ void on_GLES2_Update(float timeStep_sec)
 //------------------------------------------------------------------------------
 void on_GLES2_Render()
 {
+	// clear scene background and depth buffer
 	glClearColor(0.7f, 0.7f, 0.7f, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -340,9 +341,11 @@ void on_GLES2_Render()
 	GLint modelviewUniform = glGetUniformLocation(simpleProgram, "Modelview");
 	glUniformMatrix4fv(modelviewUniform, 1, 0, &modelViewMatrix[0]);
 
+	// get position and color slots
 	GLuint positionSlot = glGetAttribLocation(simpleProgram, "Position");
 	GLuint colorSlot = glGetAttribLocation(simpleProgram, "SourceColor");
 
+	// enable position and color slots
 	glEnableVertexAttribArray(positionSlot);
 	glEnableVertexAttribArray(colorSlot);
 
@@ -357,8 +360,10 @@ void on_GLES2_Render()
 	perspective_matrix(1.3f, aspect, 0.01, 100.0, aPerspective);
 	glUniformMatrix4fv(projUniform, 1, GL_FALSE, aPerspective);
 
+	// draw it
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
+	// disconnect slots from shader
 	glDisableVertexAttribArray(positionSlot);
 	glDisableVertexAttribArray(colorSlot);
 }
