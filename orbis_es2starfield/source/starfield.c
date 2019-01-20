@@ -5,6 +5,8 @@
  * Developer   : Jean-Milost Reymond                                         *
  *****************************************************************************/
 
+// supported platforms check. NOTE iOS, Android and Windows only, but may works on other platforms ;-)
+
 #ifdef CCR_FORCE_LLVM_INTERPRETER
     #error "Clang/LLVM on iOS does not support function pointer yet. Consider using CPP built-in compiler."
 #endif
@@ -274,7 +276,7 @@ void on_GLES2_Render()
         GLsizei vertexCount = sizeof(starVertices) / sizeof(struct QR_Vertex);
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
-
+    // disconnect slots from shader
     glDisableVertexAttribArray(positionSlot);
     glDisableVertexAttribArray(colorSlot);
 }
