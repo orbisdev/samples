@@ -227,13 +227,13 @@ static float elapsedTime;
 void UpdateScene(float elapsedTime2)
 
 {
-    // calculate next angle value, limit to 2 * PI
-    g_Angle = fmodf(g_Angle + (3.0f * elapsedTime), M_PI * 2.0f);
-    
    // timing
    gettimeofday( &t2, NULL );
    elapsedTime = t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6;
    t1 = t2;
+    
+    // calculate next angle value, limit to 2 * PI
+    g_Angle = fmodf(g_Angle + (3.0f * elapsedTime), M_PI * 2.0f);
 }
 
 
