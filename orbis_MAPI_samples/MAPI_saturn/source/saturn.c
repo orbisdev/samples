@@ -58,6 +58,7 @@ int               g_SceneInitialized  = 0;
 MINI_VertexFormat g_VertexFormat;
 //------------------------------------------------------------------------------
 
+struct timeval  t1, t2;
 #if 0
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -162,6 +163,8 @@ void CreateViewport(float w, float h)
 //------------------------------------------------------------------------------
 void InitScene(int w, int h)
 {
+    gettimeofday( &t1, NULL );
+
     // compile, link and use shader
     g_ShaderProgram = miniCompileShaders(miniGetVSTexAlpha(), miniGetFSTexAlpha());
     glUseProgram(g_ShaderProgram);
@@ -276,23 +279,31 @@ static float step  = 0.000015f;
 //------------------------------------------------------------------------------
 void UpdateScene(float elapsedTime)
 {
+    track += step;
 
-	track += step;
+    // timing
+    gettimeofday( &t2, NULL );
+    elapsedTime = t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6;
+    t1 = t2;
+    debugNetPrintf(DEBUG,"elapsedTime: %f\n", elapsedTime);
 
-   // at bounds, flip step sign
-   if(track > 0.05f
-   || track < 0.0001f)
-       { step *= -1.0; }
- 
-    elapsedTime = (float)track;	
-	
-	
+    // force value
+    elapsedTime = (float)track;
+
     // calculate next rotation angle
     g_Angle += (g_RotationSpeed * elapsedTime * 10.0f);
 
+    debugNetPrintf(DEBUG,"%f g_Angle:%f g_RotationSpeed:%f\n", elapsedTime, g_Angle, g_RotationSpeed);
+
     // is angle out of bounds?
-    while (g_Angle >= 6.28f)
+    while (g_Angle >= 6.28f){
         g_Angle -= 6.28f;
+        //debugNetPrintf(DEBUG,"- %f\n", g_Angle);
+    }
+    while (g_Angle < 6.28f){
+        g_Angle += 6.28f;
+        //debugNetPrintf(DEBUG,"+ %f\n", g_Angle);
+    }
 }
 //------------------------------------------------------------------------------
 void DrawScene()
