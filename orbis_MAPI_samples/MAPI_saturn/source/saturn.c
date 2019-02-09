@@ -270,8 +270,8 @@ void DeleteScene()
 }
 
 // hack: use fixed values, no time
-static float track = 0.00005f;
-static float step  = 0.00015f;
+static float track = 0.000005f;
+static float step  = 0.000015f;
 
 //------------------------------------------------------------------------------
 void UpdateScene(float elapsedTime)
@@ -400,16 +400,16 @@ pad_special(int special)
 {
    switch (special) {
       case 0: //_KEY_LEFT:
-         g_RotationSpeed -= 0.005;
+         g_RotationSpeed -= 0.001;
          break;
       case 1: //_KEY_RIGHT:
-         g_RotationSpeed += 0.005;
+         g_RotationSpeed += 0.001;
          break;
       case 2: //_KEY_UP:
-         g_RotationSpeed += 0.05;
+         g_RotationSpeed += 0.01;
          break;
       case 3: //_KEY_DOWN:
-         g_RotationSpeed -= 0.05;
+         g_RotationSpeed -= 0.01;
          break;
    }
 }
