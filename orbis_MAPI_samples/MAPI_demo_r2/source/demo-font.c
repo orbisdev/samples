@@ -83,9 +83,9 @@ typedef struct {
 
 // ------------------------------------------------------- global variables ---
 GLuint shader;
+texture_atlas_t *atlas;
 vertex_buffer_t *buffer;
 mat4   model, view, projection;
-texture_atlas_t *atlas;
 
 // ---------------------------------------------------------------- reshape ---
 void reshape(int width, int height)
@@ -265,7 +265,7 @@ int es2sample_init( int argc, char **argv )
     add_text( buffer, font, s, &white, &pen );  // set vertexes
 
     // 2.
-    s = L"liborbis freetype demo";  // set text
+    s = L"liborbis freetype demo";              // set text
     texture_font_load_glyphs( font, s );        // set textures
     pen.x = (ATTR_ORBISGL_WIDTH - tl);          // use Text_Length to align pen.x (right)
     pen.y -= font->height;                      // 1 line down!
@@ -295,7 +295,7 @@ int es2sample_init( int argc, char **argv )
 
         texture_font_load_glyphs( font, text );
 
-        // use Text_Length to align pen.x // printf("main: tl %f\n", tl);
+        // use Text_Length to align pen.x
         pen.x = (ATTR_ORBISGL_WIDTH - tl) /2;
         add_text( buffer, font, text, &white, &pen );
 
@@ -321,3 +321,16 @@ int es2sample_init( int argc, char **argv )
     return 0;
 }
 
+void es2sample_end(void)
+{
+    // destruct buffer, atlas
+    glDeleteTextures( 1, &atlas->id );
+    atlas->id = 0;
+    texture_atlas_delete( atlas );
+
+    if (shader)
+        glDeleteProgram(shader);
+
+    shader = 0;
+    return;
+}

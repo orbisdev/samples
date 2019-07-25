@@ -4,7 +4,7 @@
  *
  * whole EGL setup/cleanup is internally managed by liborbisGL;
  * main render loop calls 2 functions: draw and update controller;
-
+ *
  * includes playing of .mod files and controller input;
  * main skeleton results in a very basic and clean code.
  */
@@ -216,7 +216,6 @@ static bool main_loop(void)
     {
         updateController();
 
-//        glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ret = glGetError();
@@ -230,6 +229,7 @@ static bool main_loop(void)
 
         /// draw
         on_GLES2_Render();
+
         render_text();
 
 
@@ -283,6 +283,8 @@ int main(int argc, char *argv[])
 
     err:
     on_GLES2_Final();
+
+    es2sample_end();
 
     orbisAudioPause(0);
     Mod_End();
