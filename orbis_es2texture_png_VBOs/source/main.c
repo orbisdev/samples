@@ -27,6 +27,8 @@
 
 #include "defines.h"
 
+/// to apply glow effect on selected icon
+extern int selected_icon; // from VBOs.c
 
 bool flag=true;
 
@@ -93,17 +95,22 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
         {
             debugNetPrintf(DEBUG,"Right pressed\n");
+            selected_icon++;
+            sceKernelUsleep(5000);
             //pad_special(1);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
         {
             debugNetPrintf(DEBUG,"Left pressed\n");
+            selected_icon--;
+            sceKernelUsleep(5000);
             //pad_special(0);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
         {
             debugNetPrintf(DEBUG,"Triangle pressed exit\n");
-            flag=0;
+
+            flag=0;  // exit app
         }
         if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
         {
@@ -136,6 +143,8 @@ void updateController()
         {
             debugNetPrintf(DEBUG,"R2 pressed\n");
         }
+        int ret = abs(selected_icon %6); // keep icons bound
+        selected_icon = ret;
     }
 }
 
@@ -180,10 +189,12 @@ static bool initAppGl()
 bool initApp()
 {
     int ret;
+    /// hide splashscreen
     sceSystemServiceHideSplashScreen();
-    //more library initialiazation here pad,filebroser,audio,keyboard, etc
-    //....
+    /// more library initialiazation here pad,filebrowser,audio,keyboard, etc
+    /// ...
     orbisFileInit();
+
     ret=orbisPadInitWithConf(myConf->confPad);
     if(ret)
     {
@@ -207,8 +218,13 @@ bool initApp()
 }
 
 
+/// for timing, fps
+#define WEN  (8192)
+unsigned int frame   = 1,
+             time_ms = 0;
+
+
 /// main rendering loop
-int frame = 0;
 static bool main_loop(void)
 {
     int ret;
@@ -218,6 +234,7 @@ static bool main_loop(void)
         updateController();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         ret = glGetError();
         if (ret) {
             debugNetPrintf(ERROR,"[ORBIS_GL] glClear failed: 0x%08X\n", ret);
@@ -225,13 +242,24 @@ static bool main_loop(void)
         }
 
         /// update
-        on_GLES2_Update((float)frame++);
+        on_GLES2_Update((float)frame);
 
         /// draw: render all textured VBOs
         for(int i=0; i < NUM_OF_TEXTURES; i++) on_GLES2_Render(i); // background + icons
 
-        // flip frame
-        orbisGlSwapBuffers();
+        /// get timing, fps
+        if(frame %WEN == 0)
+        {
+            unsigned int now = get_time_ms();
+            debugNetPrintf(INFO,"frame: %d, took: %ums, fps: %.3f\n", frame, now - time_ms,
+                                                     ((double)WEN / (double)(now - time_ms) * 1000.f));
+            time_ms = now;
+        }
+        frame++;
+
+        orbisGlSwapBuffers();  /// flip frame
+
+        sceKernelUsleep(10000);
     }
     return true;
 
@@ -240,6 +268,7 @@ err:
 }
 
 
+extern uint32_t sdkVersion; // from ps4sdk resolver, user.c
 
 int main(int argc, char *argv[])
 {
@@ -254,12 +283,15 @@ int main(int argc, char *argv[])
         ps4LinkFinish();
         return 0;
     }
-    debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis\n");
-    sceKernelUsleep(900044); // hmmm...
 
-    // init libraries
+    /// tell sdk version
+    debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis, kern.sdk_version:%8x\n", sdkVersion);
+
+    /// init libraries
     flag=initApp();
 
+
+    /// play some audio
     Mod_Init(0);
     ret = Mod_Load("host0:main.mod");
     if(ret)
@@ -267,23 +299,29 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
-    // build shaders, setup initial state, etc.
+
+    /// build shaders, setup initial state, etc.
     on_GLES2_Init(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 
-    // enter main render loop
-    if (!main_loop())
+    /// reset timer
+    time_ms = get_time_ms();
+
+    /// enter main render loop
+    if(!main_loop())
     {
         debugNetPrintf(ERROR,"[ORBIS_GL] Main loop stopped.\n");
         goto err;
     }
 
-    err:
+  err:
+    /* destructors */
+
     on_GLES2_Final();
 
     orbisAudioPause(0);
     Mod_End();
 
-    // finish libraries
+    /// finish libraries
     finishApp();
 
     exit(EXIT_SUCCESS);

@@ -1,5 +1,9 @@
 /*
     GLES2 texture from png using shaders and VBOs
+
+    basic direct correlation: buffer[num] positions texture[num]
+
+    2019, masterzorag
 */
 
 #include <stdio.h>
@@ -11,7 +15,9 @@
 #include "defines.h"
 
 
-static GLuint simpleProgram;
+static GLuint slProgram[NUM_OF_PROGRAMS];
+static GLuint simpleProgram;  // the current one
+
 static GLuint texture[NUM_OF_TEXTURES];
 static GLuint buffer [NUM_OF_TEXTURES];
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -28,18 +34,21 @@ char *pngs[NUM_OF_TEXTURES] =
     "host0:fames/emu-icon.png"
 };
 
+// the png we apply glowing effect by switching shader
+int selected_icon = 1;
+
+// shaders locations
 static GLint a_position_location;
 static GLint a_texture_coordinates_location;
 static GLint u_texture_unit_location;
+static GLint u_time_location;
 
 // a fullscreen texture: position (X, Y), texture (S, T) (... or UVs)
-static const float rect[] = { -1.0f, -1.0f, 0.0f, 0.0f,
-                              -1.0f,  1.0f, 0.0f, 1.0f,
-                               1.0f, -1.0f, 1.0f, 0.0f,
-                               1.0f,  1.0f, 1.0f, 1.0f};
-
+static const float rect[] = { -1.0f, -1.0f, 0.0f, 1.0f,
+                              -1.0f,  1.0f, 0.0f, 0.0f,
+                               1.0f, -1.0f, 1.0f, 1.0f,
+                               1.0f,  1.0f, 1.0f, 0.0f}; // not Y flipped!
 static vec2 resolution;  // (constant)
-       vec2 tex_size;    // last loaded png size as (w, h)
 
 static void setup_texture_position(int num, vec2 pos, const float scale_f)
 {
@@ -47,9 +56,9 @@ static void setup_texture_position(int num, vec2 pos, const float scale_f)
 
     /*p = pixel_to_normalized(pos, tex_size);*/
 
-    vec4 p; // (x, y),  (x + texture.w, y + texture.h)
+    vec4 p; // 2 points .xy pair: (x, y),  (x + texture.w, y + texture.h)
 
-    p.xy  = -1. + 2. / resolution * pos; // (-1,-1) is BOTTOMLEFT, (1,1) IS UPRIGHT
+    p.xy  = -1. + 2. / resolution * pos; // (-1,-1) is BOTTOMLEFT, (1,1) is UPRIGHT
     p.zw  = -1. + 2. / resolution * (pos + tex_size);
     p.yw *= -1.; // flip Y axis
 
@@ -59,94 +68,21 @@ static void setup_texture_position(int num, vec2 pos, const float scale_f)
                                p.x, p.w,  0.f, 1.f,   // BTLF
                                p.z, p.y,  1.f, 0.f,   // BTRG
                                p.z, p.w,  1.f, 1.f }; // TPRG
-
     // setup triangle positions to draw
     buffer[num] = create_vbo(sizeof(vertexes), vertexes, GL_STATIC_DRAW);
-}
-
-GLuint create_vbo(const GLsizeiptr size, const GLvoid* data, const GLenum usage)
-{
-    assert(data != NULL);
-    GLuint vbo_object;
-    glGenBuffers(1, &vbo_object);
-    assert(vbo_object != 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_object);
-    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    return vbo_object;
-}
-
-GLuint BuildShader(const char *source, GLenum shaderType)
-{
-    GLuint shaderHandle = glCreateShader(shaderType);
-    glShaderSource(shaderHandle, 1, &source, 0);
-    glCompileShader(shaderHandle);
-    GLint compileSuccess;
-    glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compileSuccess);
-
-    if (compileSuccess == GL_FALSE)
-    {
-        GLchar messages[256];
-        glGetShaderInfoLog(shaderHandle, sizeof(messages), 0, &messages[0]);
-        debugNetPrintf(DEBUG, "compile glsl error : %s\n", messages);
-    }
-
-    return shaderHandle;
-}
-
-GLuint BuildProgram(const char *vShader, const char *fShader)
-{
-    GLuint vertexShader   = BuildShader(vShader, GL_VERTEX_SHADER);
-    GLuint fragmentShader = BuildShader(fShader, GL_FRAGMENT_SHADER);
-
-    GLuint programHandle = glCreateProgram();
-    glAttachShader(programHandle, vertexShader);
-    glAttachShader(programHandle, fragmentShader);
-    glLinkProgram(programHandle);
-
-    GLint linkSuccess;
-    glGetProgramiv(programHandle, GL_LINK_STATUS, &linkSuccess);
-    if (linkSuccess == GL_FALSE)
-    {
-        GLchar messages[256];
-        glGetProgramInfoLog(programHandle, sizeof(messages), 0, &messages[0]);
-        debugNetPrintf(DEBUG, "compile glsl error : %s\n", messages);
-    }
-
-    return programHandle;
 }
 
 //https://github.com/learnopengles/airhockey/commit/228ce050da304258feca8d82690341cb50c27532
 //OpenGLES2 handlers : init , final , update , render , touch-input
 void on_GLES2_Init(int view_w, int view_h)
 {
-     const char *simpleVertexShader =
-       "attribute vec4 a_Position; \
-        attribute vec2 a_TextureCoordinates; \
-        varying   vec2 v_TextureCoordinates; \
-        void main() \
-        { \
-          v_TextureCoordinates = a_TextureCoordinates; \
-          gl_Position = a_Position; \
-        }";
-
-     const char *simpleFragmentShader =
-       "precision mediump float; \
-        uniform   sampler2D u_TextureUnit; \
-        varying   vec2      v_TextureCoordinates; \
-        void main(void) \
-        { \
-          gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates); \
-        }";
-
     resolution = (vec2){ view_w, view_h }; // setup resolution for next setup_texture_position()
 
     for(int i = 0; i < NUM_OF_TEXTURES; i++)
     {
         texture[i] = load_png_asset_into_texture(pngs[i]);
-        debugNetPrintf(DEBUG, "load_png_asset_into_texture '%s' ret: %d\n", pngs[i], texture[i]);
+        if(!texture[i])
+            debugNetPrintf(DEBUG, "load_png_asset_into_texture '%s' ret: %d\n", pngs[i], texture[i]);
 
         // setup triangle positions to draw
         if(i)
@@ -155,19 +91,33 @@ void on_GLES2_Init(int view_w, int view_h)
             buffer[i] = create_vbo(sizeof(rect), rect, GL_STATIC_DRAW); // background
     }
 
-    simpleProgram = BuildProgram(simpleVertexShader, simpleFragmentShader);
-    glUseProgram(simpleProgram);
+    for(int i = 0; i < NUM_OF_PROGRAMS; i++)
+    {
+        slProgram[i] =
+        #ifdef HAVE_SHACC
+            BuildProgram(simpleVertexShader, simpleFragmentShader[i]);
+        #else
+            CreateProgramFromBinary(i);
+        #endif
 
-    a_position_location            = glGetAttribLocation (simpleProgram, "a_Position");
-    a_texture_coordinates_location = glGetAttribLocation (simpleProgram, "a_TextureCoordinates");
-    u_texture_unit_location        = glGetUniformLocation(simpleProgram, "u_TextureUnit");
+        debugNetPrintf(DEBUG, "slProgram[%d]: %u\n", i, slProgram[i]);
+        simpleProgram = slProgram[i];
+
+        glUseProgram(simpleProgram);
+
+        a_position_location            = glGetAttribLocation (simpleProgram, "a_Position");
+        a_texture_coordinates_location = glGetAttribLocation (simpleProgram, "a_TextureCoordinates");
+        u_texture_unit_location        = glGetUniformLocation(simpleProgram, "u_TextureUnit");
+        u_time_location                = glGetUniformLocation(simpleProgram, "u_time");
+    }
+    // reset to first one
+    simpleProgram = slProgram[0];
 }
 
 void on_GLES2_Final(void)
 {
-    if (simpleProgram)
-        glDeleteProgram(simpleProgram);
-    simpleProgram = 0;
+    for(int i = 0; i < NUM_OF_PROGRAMS; ++i)
+        { if(slProgram[i]) glDeleteProgram(slProgram[i]), slProgram[i] = 0; }
 }
 
 void on_GLES2_Size(int view_w, int view_h)
@@ -175,15 +125,25 @@ void on_GLES2_Size(int view_w, int view_h)
     glViewport(0, 0, view_w, view_h);
 }
 
-void on_GLES2_Update(float timeStep_sec)
+void on_GLES2_Update(int frame)
 {
+    float t = (float)frame /10.; // slow down
 
+    for(int i = 0; i < NUM_OF_PROGRAMS; ++i)
+    {
+        glUseProgram(slProgram[i]);
+        // write the value to the shaders
+        glUniform1f(glGetUniformLocation(slProgram[i], "u_time"), t);
+    }
 }
-
 
 void on_GLES2_Render(int num) // which texture to draw
 {
     // we already clean
+
+    simpleProgram = slProgram[0]; // default
+
+    if(num == selected_icon) simpleProgram = slProgram[1]; // glowing effect
 
     glUseProgram(simpleProgram);
 
@@ -215,8 +175,10 @@ void on_GLES2_Render(int num) // which texture to draw
     // revert state back
     glDisable(GL_BLEND);
 
-    // release VBO and texture
+    // release VBO, texture and program
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glActiveTexture(0); // error on piglet !!
+    glUseProgram(0);
 
     // we already flip/swap
 }

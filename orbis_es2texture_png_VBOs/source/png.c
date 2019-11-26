@@ -9,8 +9,6 @@
 #include "defines.h"
 
 
-extern vec2 tex_size; // last loaded png image size as (w, h)
-
 static GLuint load_texture(
     const GLsizei width, const GLsizei height,
     const GLenum  type,  const GLvoid *pixels)
@@ -51,20 +49,22 @@ static GLuint load_texture(
     return texture_object_id;
 }
 
+
+/* externed */ vec2 tex_size; // last loaded png size as (w, h)
+
+/// textures
 GLuint load_png_asset_into_texture(const char* relative_path)
 {
     assert(relative_path != NULL);
 
-    Orbis2dTexture* texture_raw = orbis2dLoadPngFromHost_v2(relative_path); // _v3 rely on liborbisFile!
+    Orbis2dTexture* texture_raw = orbis2dLoadPngFromHost_v3(relative_path); // _v3 rely on liborbisFile!
 
     GLenum format = GL_RGBA;
     if (texture_raw->depth == 8) format = GL_RGB;
 
-    const GLuint texture_object_id = load_texture( texture_raw->width,
-                                                   texture_raw->height,
+    const GLuint texture_object_id = load_texture( texture_raw->width, texture_raw->height,
                                                    format,
                                                    orbis2dTextureGetDataPointer(texture_raw));
-
     // take note of image resolution size to setup VBO in px size
     tex_size = (vec2){ texture_raw->width, texture_raw->height };
 
