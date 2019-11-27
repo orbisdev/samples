@@ -31,9 +31,8 @@ static GLuint load_texture(
 
     // when using VBOs, we use this:
     glGenerateMipmap(GL_TEXTURE_2D); 
-    glBindTexture(GL_TEXTURE_2D, 0);
 
-#elif defined _MAPI_ 
+#elif defined _MAPI_
     // set texture filtering
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -46,6 +45,9 @@ static GLuint load_texture(
     glTexImage2D(GL_TEXTURE_2D, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, pixels);
 
 #endif
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     return texture_object_id;
 }
 
