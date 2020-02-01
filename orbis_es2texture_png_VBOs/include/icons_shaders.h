@@ -1,7 +1,7 @@
 /*
-    VBOs_shaders.h
+    icons_shaders.h
 
-    shaders used in VBOs.c
+    shaders used in icons.c
 
     - one shared vertex shader:
       locations for added: offset (unused), u_time
@@ -30,7 +30,7 @@ static const char *simpleVertexShader =
 
 
 /// 2. Fragment shaders
-static const char *simpleFragmentShader[NUM_OF_PROGRAMS] =
+static const char *simpleFragmentShader[2] =
 {
  /// 1. default textured fragment
     "precision mediump float;"

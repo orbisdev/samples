@@ -93,8 +93,9 @@ GLuint CreateProgramFromBinary(unsigned int i) //const char *vShader, const char
 
     const GLvoid *fShader; // use embedded .sb
     switch(i)
-    {   // select which fragment shader will be used, for program i
+    {   // select which fragment shader will be used, for program i //todo enums
         default:
+        /* icons_binary_shaders.h */
         case 0:  fShader = &fShader0; break;
         case 1:  fShader = &fShader1; break;
         /* more SL program pairs to add ! */

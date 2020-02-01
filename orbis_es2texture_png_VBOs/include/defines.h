@@ -4,18 +4,12 @@
 #define HAVE_SHACC // main switch: undefined to use embedded .sb
 
 
-/*
-    we setup 2 SL programs:
-    0. use default color from texture
-    1. use glowing effect on passed time
-*/
-#define NUM_OF_PROGRAMS  (2)
 #define NUM_OF_TEXTURES  (6)
 
 #ifdef HAVE_SHACC
-    #include "VBOs_shaders.h"
+    #include "icons_shaders.h"
 #else
-    #include "VBOs_binary_shaders.h"
+    #include "icons_binary_shaders.h"
 #endif
 
 

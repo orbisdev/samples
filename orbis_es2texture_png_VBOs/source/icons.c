@@ -13,6 +13,12 @@
 #include <debugnet.h>
 
 #include "defines.h"
+/*
+    we setup two SL programs:
+    0. use default color from texture
+    1. use glowing effect on passed time
+*/
+#define NUM_OF_PROGRAMS  (2)
 
 
 static GLuint slProgram[NUM_OF_PROGRAMS];
@@ -99,12 +105,10 @@ void on_GLES2_Init(int view_w, int view_h)
         #else
             CreateProgramFromBinary(i);
         #endif
-
         debugNetPrintf(DEBUG, "slProgram[%d]: %u\n", i, slProgram[i]);
         simpleProgram = slProgram[i];
 
         glUseProgram(simpleProgram);
-
         a_position_location            = glGetAttribLocation (simpleProgram, "a_Position");
         a_texture_coordinates_location = glGetAttribLocation (simpleProgram, "a_TextureCoordinates");
         u_texture_unit_location        = glGetUniformLocation(simpleProgram, "u_TextureUnit");
@@ -124,6 +128,7 @@ void on_GLES2_Size(int view_w, int view_h)
 {
     glViewport(0, 0, view_w, view_h);
 }
+
 
 void on_GLES2_Update(int frame)
 {
@@ -182,3 +187,4 @@ void on_GLES2_Render(int num) // which texture to draw
 
     // we already flip/swap
 }
+

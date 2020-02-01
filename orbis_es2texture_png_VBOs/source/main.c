@@ -4,7 +4,7 @@
  *
  * whole EGL setup/cleanup is internally managed by liborbisGL;
  * main render loop calls 2 functions: draw and update controller;
-
+ *
  * includes playing of .mod files and controller input;
  * main skeleton results in a very basic and clean code.
  */
@@ -28,7 +28,7 @@
 #include "defines.h"
 
 /// to apply glow effect on selected icon
-extern int selected_icon; // from VBOs.c
+extern int  selected_icon; // from icons.c
 
 bool flag=true;
 
