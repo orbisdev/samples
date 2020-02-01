@@ -22,15 +22,38 @@ mat4 model, view, projection;
 texture_font_t *font=0;
 texture_atlas_t *atlas;
 int orbisGlTextEnabled=0;
+void orbisGlTextClearBuffer()
+{
+	vertex_buffer_clear(buffer);
+}
+void orbisGlTextDraw()
+{
+//glClearColor( 0.3, 0.1, 0.9, 1 ); // BGRA
+	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-void orbisGlTextDraw(char *mytext,int x,int y,int h,vec4 color)
+	glUseProgram( shader );
+    
+	glBindTexture( GL_TEXTURE_2D, atlas->id );
+	glUniform1i( glGetUniformLocation( shader, "texture" ),0 );
+	glUniformMatrix4fv( glGetUniformLocation( shader, "model" ),1, 0, model.data);
+	glUniformMatrix4fv( glGetUniformLocation( shader, "view" ),1, 0, view.data);
+	glUniformMatrix4fv( glGetUniformLocation( shader, "projection" ),1, 0, projection.data);
+	vertex_buffer_render( buffer, GL_TRIANGLES );
+    
+	glUseProgram(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_BLEND);
+}
+void orbisGlTextDrawBuffer(char *mytext,int x,int y,int h,vec4 color)
 {
 	if(orbisGlTextEnabled==0)
 	{
 		return;
 	}
 	//wchar_t *mytext = L"nemesis.rom NEMESIS.ROM ";
-	vertex_buffer_clear(buffer);
+	//vertex_buffer_clear(buffer);
 	size_t i;
 	vec2 ppen={{x,1080-y}};
 	vec2 *pen=&ppen;
@@ -66,23 +89,7 @@ void orbisGlTextDraw(char *mytext,int x,int y,int h,vec4 color)
 		
 	}
 
-	//glClearColor( 0.3, 0.1, 0.9, 1 ); // BGRA
-	//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glUseProgram( shader );
-    
-	glBindTexture( GL_TEXTURE_2D, atlas->id );
-	glUniform1i( glGetUniformLocation( shader, "texture" ),0 );
-	glUniformMatrix4fv( glGetUniformLocation( shader, "model" ),1, 0, model.data);
-	glUniformMatrix4fv( glGetUniformLocation( shader, "view" ),1, 0, view.data);
-	glUniformMatrix4fv( glGetUniformLocation( shader, "projection" ),1, 0, projection.data);
-	vertex_buffer_render( buffer, GL_TRIANGLES );
-    
-	glUseProgram(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_BLEND);
+	
 }
 
 void orbisGlTextFinish()
