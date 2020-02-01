@@ -180,6 +180,7 @@ static bool initAppGl()
 bool initApp()
 {
     int ret;
+
     /// hide splashscreen
     sceSystemServiceHideSplashScreen();
     /// more library initialiazation here pad,filebrowser,audio,keyboard, etc
@@ -208,9 +209,11 @@ bool initApp()
     return true;
 }
 
+
 unsigned int frame = 1;
 
 /// main rendering loop
+
 static bool main_loop(void)
 {
     int ret;
@@ -278,7 +281,6 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
-
     /// build shaders, setup initial state, etc.
     on_GLES2_Init(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
     es2sample_init();
@@ -305,4 +307,3 @@ int main(int argc, char *argv[])
 
     exit(EXIT_SUCCESS);
 }
-

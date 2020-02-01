@@ -54,9 +54,11 @@ demo-font.c \
  * ============================================================================
  */
 #include <stdio.h>
+
 #include <string.h>
 
 #include <freetype-gl.h>  // links against libfreetype-gl
+
 
 #if defined(__APPLE__)
     #include <Glut/glut.h>
@@ -65,6 +67,7 @@ demo-font.c \
 #elif defined(__PS4__)
     #include <debugnet.h>
     #include <orbisFile.h>
+
     extern size_t _orbisFile_lastopenFile_size;
 #else
     #include <GL/glut.h>
@@ -80,6 +83,7 @@ typedef struct {
     float s, t;       // texture
     float r, g, b, a; // color
 } vertex_t;
+
 
 
 // ------------------------------------------------------- global variables ---
@@ -149,10 +153,12 @@ static void add_text( vertex_buffer_t * buffer, texture_font_t * font,
             int   y0 = (int)( pen->y + glyph->offset_y );
             int   x1 = (int)( x0 + glyph->width );
             int   y1 = (int)( y0 - glyph->height );
+
             float s0 = glyph->s0;
             float t0 = glyph->t0;
             float s1 = glyph->s1;
             float t1 = glyph->t1;
+
             GLuint indices[6] = {0,1,2, 0,2,3}; // (two triangles)
             /* VBO is setup as: "vertex:3f, tex_coord:2f, color:4f" */
             vertex_t vertices[4] = { { x0,y0,0,   s0,t0,   r,g,b,a },
@@ -164,6 +170,7 @@ static void add_text( vertex_buffer_t * buffer, texture_font_t * font,
         }
     }
 }
+
 // ------------------------------------------------------ freetype-gl shaders ---
 GLuint CreateProgram(void)
 {
@@ -202,12 +209,15 @@ GLuint CreateProgram(void)
             gl_FragColor = vec4(fragColor.rgb, fragColor.a*a); \
         }";
 
+
     /* we can use OrbisGl wrappers, or MiniAPI ones */
 #ifndef _MAPI_
+
     GLuint vertexShader;
     GLuint fragmentShader;
 
     vertexShader = orbisGlCompileShader(GL_VERTEX_SHADER, s_vertex_shader_code);
+
     if(!vertexShader)
         { debugNetPrintf(DEBUG, "Error during compiling vertex shader !\n"); }
 
@@ -267,10 +277,12 @@ int es2sample_init(void)
 
     // 2.
     s = "liborbis freetype demo";               // set text
+
     texture_font_load_glyphs( font, s );        // set textures
     pen.x = (ATTR_ORBISGL_WIDTH - tl);          // use Text_Length to align pen.x (right)
     pen.y -= font->height;                      // 1 line down!
     add_text( buffer, font, s, &white, &pen );  // set vertexes
+
 
     texture_font_delete( font ); // done with this font, cleanup
 
@@ -307,10 +319,12 @@ int es2sample_init(void)
 
         pen.x = (ATTR_ORBISGL_WIDTH - tl) /2; // use Text_Length to align pen.x
 
+
         add_text( buffer, font, text, &white, &pen );
 
         texture_font_delete( font );
     }
+
 
     /* create texture and upload atlas into */
     glGenTextures  ( 1, &atlas->id );
@@ -324,6 +338,7 @@ int es2sample_init(void)
 
     /* compile, link and use shader */
     shader = CreateProgram();
+
     if(!shader)
     {
         debugNetPrintf(DEBUG,"program creation failed\n");
@@ -338,6 +353,7 @@ int es2sample_init(void)
     return 0;
 }
 
+
 void es2sample_end(void)
 {
     texture_atlas_delete(atlas),  atlas  = NULL;
@@ -348,4 +364,3 @@ void es2sample_end(void)
 
     return;
 }
-

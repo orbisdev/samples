@@ -1,0 +1,16 @@
+uniform vec2 screenHalfSize;
+
+attribute vec2 vertPosition_screenspace;
+attribute vec2 texCoord0;
+
+varying vec2 vTexCoord;
+
+void main()
+{
+    // map screen coordinates to [-1..1][-1..1]
+    vec2 vertPosition_clipspace = (vertPosition_screenspace / screenHalfSize) - vec2(1,1);
+    // invert Y coordinate, because screenspace has its origin at the upper-left instead of lower-left
+    gl_Position =  vec4(vertPosition_clipspace.x,-vertPosition_clipspace.y,0,1);
+    
+    vTexCoord = texCoord0;
+}

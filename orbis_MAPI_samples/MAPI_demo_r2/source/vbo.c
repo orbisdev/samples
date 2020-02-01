@@ -49,6 +49,7 @@ GLuint BuildShader(const char *source, GLenum shaderType)
 	glCompileShader(shaderHandle);
 	GLint compileSuccess;
 	glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compileSuccess);
+
 	if (compileSuccess == GL_FALSE)
 	{
 		GLchar messages[256];
@@ -77,8 +78,9 @@ GLuint BuildProgram(const char *vShader, const char *fShader)
 		glGetProgramInfoLog(programHandle, sizeof(messages), 0, &messages[0]);
 		debugNetPrintf(DEBUG, "compile glsl error : %s\n", messages);
 	}
-    if(vertexShader)   { glDeleteShader(vertexShader),   vertexShader   = 0; }
-    if(fragmentShader) { glDeleteShader(fragmentShader), fragmentShader = 0; }
+
+  if(vertexShader)   { glDeleteShader(vertexShader),   vertexShader   = 0; }
+  if(fragmentShader) { glDeleteShader(fragmentShader), fragmentShader = 0; }
 
 	return programHandle;
 }
