@@ -164,6 +164,7 @@ static void CreateViewport(float w, float h)
     g_Resolution.m_Y = h;
 }
 
+
 //------------------------------------------------------------------------------
 void InitScene_1(int w, int h)
 {
@@ -172,15 +173,20 @@ void InitScene_1(int w, int h)
 
     for(int i=0; i<NUM_OF_PROGRAMS; i++)
     {
-           g_pSurfaceVB[i]         = 0;
-           g_SurfaceVertexCount[i] = 0;
+        g_pSurfaceVB[i]         = 0;
+        g_SurfaceVertexCount[i] = 0;
 
-    // we can use OrbisGl shader wrappers, or MiniAPI ones
-    #define __PGL_ORBISGL__
-
-    #if defined __PGL_ORBISGL__
+        const char *g_frag_source;
+        switch(i) // switch fragment program source
+        {
+          case 0: g_frag_source = g_pshadersource;  break;
+          case 1: g_frag_source = g_pshadersource1; break;
+        }
 
         // compile, link and use shader
+
+    /* we can use OrbisGl wrappers, or MiniAPI ones */
+    #ifndef _MAPI_
         GLuint vertexShader;
         GLuint fragmentShader;
 
@@ -189,14 +195,8 @@ void InitScene_1(int w, int h)
         if (!vertexShader) {
             debugNetPrintf(DEBUG, "Error during compiling vertex shader !\n");
         }
-
-        // switch fragment program source
-        if(i == 0)
-        {
-            fragmentShader = orbisGlCompileShader(GL_FRAGMENT_SHADER, g_pshadersource);
-        } else {
-            fragmentShader = orbisGlCompileShader(GL_FRAGMENT_SHADER, g_pshadersource1);
-        }
+        // different fragment shaders after switch()
+        fragmentShader = orbisGlCompileShader(GL_FRAGMENT_SHADER, g_frag_source);
         if (!fragmentShader) {
             debugNetPrintf(DEBUG, "Error during compiling fragment shader !\n");
         }
@@ -207,10 +207,12 @@ void InitScene_1(int w, int h)
         }
         debugNetPrintf(DEBUG, "g_ShaderProgram[%d]:%d\n", i, g_ShaderProgram[i]);
 
-    #else // use MiniAPI wrapper (link against MiniAPI lib)
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
 
-        // compile, link and use shader
-        g_ShaderProgram[i] = miniCompileShaders(g_pVertexShader, g_pshadersource);
+    #else /* include and links against MiniAPI library! */
+
+        g_ShaderProgram[i] = miniCompileShaders(g_pVertexShader, g_frag_source);
 
     #endif
 
@@ -370,7 +372,8 @@ void DrawScene_1(void)
 #define STEP  (0.005)  // a small positive delta
 void pad_special(int special)
 {
-    switch (special) {
+    switch (special)
+    {
         case 0: //_KEY_LEFT:
             if(g_MousePos.m_X > -1.000) g_MousePos.m_X -= STEP;
             break;
@@ -380,8 +383,8 @@ void pad_special(int special)
         case 2: //_KEY_UP:
             if(g_MousePos.m_Y < 1.000)  g_MousePos.m_Y += STEP;
             scene_num++;
-            sceKernelUsleep(900044);
-            //debugNetPrintf(DEBUG, "scene_num = %d %d\n", scene_num, scene_num %2);
+            //debugNetPrintf(DEBUG, "scene_num = %d %d\n", scene_num, scene_num %NUM_OF_PROGRAMS);
+            sceKernelUsleep(100000);
             break;
         case 3: //_KEY_DOWN:
             if(g_MousePos.m_Y > -1.000) g_MousePos.m_Y -= STEP;

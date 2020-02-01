@@ -102,7 +102,8 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
         {
             debugNetPrintf(DEBUG,"Triangle pressed exit\n");
-            flag=0;
+
+            flag=0;  // exit app
         }
         if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
         {
@@ -179,10 +180,12 @@ static bool initAppGl()
 bool initApp()
 {
     int ret;
+    /// hide splashscreen
     sceSystemServiceHideSplashScreen();
-    //more library initialiazation here pad,filebroser,audio,keyboard, etc
-    //....
+    /// more library initialiazation here pad,filebrowser,audio,keyboard, etc
+    /// ...
     orbisFileInit();
+
     ret=orbisPadInitWithConf(myConf->confPad);
     if(ret)
     {
@@ -205,9 +208,9 @@ bool initApp()
     return true;
 }
 
+unsigned int frame = 1;
 
 /// main rendering loop
-int frame = 0;
 static bool main_loop(void)
 {
     int ret;
@@ -224,7 +227,6 @@ static bool main_loop(void)
             goto err;
         }
 
-
         /// draw then update, each program
         DrawScene_1();
         UpdateScene_1(0.1);
@@ -237,8 +239,9 @@ static bool main_loop(void)
         render_text();
 
 
-        // flip frame
-        orbisGlSwapBuffers();
+        orbisGlSwapBuffers();  /// flip frame
+
+        sceKernelUsleep(10000);
     }
     return true;
 
@@ -247,6 +250,7 @@ err:
 }
 
 
+extern uint32_t sdkVersion; // from ps4sdk resolver, user.c
 
 int main(int argc, char *argv[])
 {
@@ -261,12 +265,15 @@ int main(int argc, char *argv[])
         ps4LinkFinish();
         return 0;
     }
-    debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis\n");
-    sleep(1);
 
-    // init libraries
+    /// tell sdk version
+    debugNetPrintf(INFO,"[ORBIS_GL] Hello from GL ES sample with hitodama's sdk and liborbis, kern.sdk_version:%8x\n", sdkVersion);
+
+    /// init libraries
     flag=initApp();
 
+
+    /// play some audio
     Mod_Init(0);
     ret = Mod_Load("host0:main.mod");
     if(ret)
@@ -274,19 +281,21 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
-    // build shaders, setup initial state, etc.
+
+    /// build shaders, setup initial state, etc.
     InitScene_1(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
     //InitScene_2(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
     es2sample_init();
 
-    // enter main render loop
-    if (!main_loop())
+    /// enter main render loop
+    if(!main_loop())
     {
         debugNetPrintf(ERROR,"[ORBIS_GL] Main loop stopped.\n");
         goto err;
     }
 
-    err:
+  err:
+    /* destructors */
     DeleteScene_1();
 //    DeleteScene_2();
 
@@ -295,8 +304,9 @@ int main(int argc, char *argv[])
     orbisAudioPause(0);
     Mod_End();
 
-    // finish libraries
+    /// finish libraries
     finishApp();
 
     exit(EXIT_SUCCESS);
 }
+

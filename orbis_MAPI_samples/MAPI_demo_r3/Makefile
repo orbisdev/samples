@@ -17,9 +17,9 @@ TargetFile=homebrew.elf
 
 include $(Ps4Sdk)/make/ps4sdk.mk
 
-LinkerFlags += -lfreetype-gl -lfreetype -lMiniAPI -ldebugnet -lps4link -lorbisFile -lelfloader -lorbisKeyboard -lorbis2d -lorbisGl -lScePigletv2VSH_stub -lSceIme_stub -lSceSysmodule_stub -lorbisPad -lorbisAudio -lmod -lSceNet_stub -lSceAudioOut_stub -lSceVideoOut_stub -lSceSystemService_stub -lSceUserService_stub -lSceGnmDriver_stub -lScePad_stub -lpng -lz
+LinkerFlags += -lfreetype-gl2 -lfreetype -lMiniAPI -ldebugnet -lps4link -lorbisFile -lelfloader -lorbisKeyboard -lorbis2d -lorbisGl -lScePigletv2VSH_stub -lSceIme_stub -lSceSysmodule_stub -lorbisPad -lorbisAudio -lmod -lSceNet_stub -lSceAudioOut_stub -lSceVideoOut_stub -lSceSystemService_stub -lSceUserService_stub -lSceGnmDriver_stub -lScePad_stub -lpng -lz
 
-IncludePath += -I$(Ps4Sdk)/include/MiniAPI -I$(Ps4Sdk)/include/freetype2 -I$(Ps4Sdk)/include/freetype-gl
+IncludePath += -I$(Ps4Sdk)/include/MiniAPI -I$(Ps4Sdk)/include/freetype2 -I$(Ps4Sdk)/include/freetype-gl2
 
 CompilerFlags += -D_MAPI_
 
