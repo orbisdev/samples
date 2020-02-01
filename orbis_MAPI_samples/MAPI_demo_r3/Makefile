@@ -21,6 +21,5 @@ LinkerFlags += -lfreetype-gl2 -lfreetype -lMiniAPI -ldebugnet -lps4link -lorbisF
 
 IncludePath += -I$(Ps4Sdk)/include/MiniAPI -I$(Ps4Sdk)/include/freetype2 -I$(Ps4Sdk)/include/freetype-gl2
 
-
 CompilerFlags += -D_MAPI_
 

@@ -82,22 +82,22 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
         {
             debugNetPrintf(DEBUG,"Up pressed\n");
-            //pad_special(2);
+            pad_special(2);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
         {
             debugNetPrintf(DEBUG,"Down pressed\n");
-            //pad_special(3);
+            pad_special(3);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
         {
             debugNetPrintf(DEBUG,"Right pressed\n");
-            //pad_special(1);
+            pad_special(1);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
         {
             debugNetPrintf(DEBUG,"Left pressed\n");
-            //pad_special(0);
+            pad_special(0);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
         {
@@ -180,7 +180,6 @@ static bool initAppGl()
 bool initApp()
 {
     int ret;
-
     /// hide splashscreen
     sceSystemServiceHideSplashScreen();
     /// more library initialiazation here pad,filebrowser,audio,keyboard, etc
@@ -209,11 +208,9 @@ bool initApp()
     return true;
 }
 
-
 unsigned int frame = 1;
 
 /// main rendering loop
-
 static bool main_loop(void)
 {
     int ret;
@@ -230,11 +227,14 @@ static bool main_loop(void)
             goto err;
         }
 
-        /// update
-        on_GLES2_Update((float)frame++);
+        /// draw then update, each program
+        DrawScene_1();
+        UpdateScene_1(0.1);
 
-        /// draw
-        on_GLES2_Render();
+/*
+        DrawScene_2();
+        UpdateScene_2(0.1);
+*/
 
         render_text();
 
@@ -281,8 +281,10 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
+
     /// build shaders, setup initial state, etc.
-    on_GLES2_Init(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+    InitScene_1(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+    //InitScene_2(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
     es2sample_init();
 
     /// enter main render loop
@@ -294,8 +296,8 @@ int main(int argc, char *argv[])
 
   err:
     /* destructors */
-
-    on_GLES2_Final();
+    DeleteScene_1();
+//    DeleteScene_2();
 
     es2sample_end();
 
@@ -307,3 +309,4 @@ int main(int argc, char *argv[])
 
     exit(EXIT_SUCCESS);
 }
+

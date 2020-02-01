@@ -25,7 +25,10 @@
 #include <orbisGl.h>
 #include <unistd.h>
 
+#include "defines.h"
 
+/// to apply glow effect on selected icon
+extern int  selected_icon; // from icons.c
 
 bool flag=true;
 
@@ -92,11 +95,15 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
         {
             debugNetPrintf(DEBUG,"Right pressed\n");
+            selected_icon++;
+            sceKernelUsleep(5000);
             //pad_special(1);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
         {
             debugNetPrintf(DEBUG,"Left pressed\n");
+            selected_icon--;
+            sceKernelUsleep(5000);
             //pad_special(0);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
@@ -136,6 +143,8 @@ void updateController()
         {
             debugNetPrintf(DEBUG,"R2 pressed\n");
         }
+        int ret = abs(selected_icon %6); // keep icons bound
+        selected_icon = ret;
     }
 }
 
@@ -180,7 +189,6 @@ static bool initAppGl()
 bool initApp()
 {
     int ret;
-
     /// hide splashscreen
     sceSystemServiceHideSplashScreen();
     /// more library initialiazation here pad,filebrowser,audio,keyboard, etc
@@ -210,10 +218,13 @@ bool initApp()
 }
 
 
-unsigned int frame = 1;
+/// for timing, fps
+#define WEN  (8192)
+unsigned int frame   = 1,
+             time_ms = 0;
+
 
 /// main rendering loop
-
 static bool main_loop(void)
 {
     int ret;
@@ -231,13 +242,20 @@ static bool main_loop(void)
         }
 
         /// update
-        on_GLES2_Update((float)frame++);
+        on_GLES2_Update((float)frame);
 
-        /// draw
-        on_GLES2_Render();
+        /// draw: render all textured VBOs
+        for(int i=0; i < NUM_OF_TEXTURES; i++) on_GLES2_Render(i); // background + icons
 
-        render_text();
-
+        /// get timing, fps
+        if(frame %WEN == 0)
+        {
+            unsigned int now = get_time_ms();
+            debugNetPrintf(INFO,"frame: %d, took: %ums, fps: %.3f\n", frame, now - time_ms,
+                                                     ((double)WEN / (double)(now - time_ms) * 1000.f));
+            time_ms = now;
+        }
+        frame++;
 
         orbisGlSwapBuffers();  /// flip frame
 
@@ -281,9 +299,12 @@ int main(int argc, char *argv[])
 
     orbisAudioResume(0);
 
+
     /// build shaders, setup initial state, etc.
     on_GLES2_Init(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
-    es2sample_init();
+
+    /// reset timer
+    time_ms = get_time_ms();
 
     /// enter main render loop
     if(!main_loop())
@@ -296,8 +317,6 @@ int main(int argc, char *argv[])
     /* destructors */
 
     on_GLES2_Final();
-
-    es2sample_end();
 
     orbisAudioPause(0);
     Mod_End();

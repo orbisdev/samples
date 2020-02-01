@@ -79,6 +79,9 @@ GLuint BuildProgram(const char *vShader, const char *fShader)
 		debugNetPrintf(DEBUG, "compile glsl error : %s\n", messages);
 	}
 
+  if(vertexShader)   { glDeleteShader(vertexShader),   vertexShader   = 0; }
+  if(fragmentShader) { glDeleteShader(fragmentShader), fragmentShader = 0; }
+
 	return programHandle;
 }
 
@@ -112,7 +115,7 @@ void on_GLES2_Init(int view_w, int view_h)
 
 	simpleProgram = BuildProgram(simpleVertexShader, simpleFragmentShader);
 	glUseProgram(simpleProgram);
-    
+
     a_position_location            = glGetAttribLocation (simpleProgram, "a_Position");
     a_texture_coordinates_location = glGetAttribLocation (simpleProgram, "a_TextureCoordinates");
     u_texture_unit_location        = glGetUniformLocation(simpleProgram, "u_TextureUnit");
@@ -120,45 +123,48 @@ void on_GLES2_Init(int view_w, int view_h)
 
 void on_GLES2_Final()
 {
-	if (simpleProgram)
-		glDeleteProgram(simpleProgram);
-
-	simpleProgram = 0;
+    if(simpleProgram)
+        glDeleteProgram(simpleProgram), simpleProgram = 0;
 }
 
 void on_GLES2_Size(int view_w, int view_h)
 {
-	glViewport(0, 0, view_w, view_h);
+    glViewport(0, 0, view_w, view_h);
 }
 
 void on_GLES2_Update(float timeStep_sec)
 {
-    
+    // nothing
 }
 
 void on_GLES2_Render()
 {
-    // we already clean in main renderloop()!
+    // we already clean
  
     glUseProgram(simpleProgram);
- 
+
+    // select requested texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glUniform1i(u_texture_unit_location, 0);
- 
     glBindBuffer(GL_ARRAY_BUFFER, buffer); // bind VBO
 
+    // setup attr
     glVertexAttribPointer(a_position_location,
         2, GL_FLOAT, GL_FALSE, 4 * sizeof(GL_FLOAT), BUFFER_OFFSET(0));
     glVertexAttribPointer(a_texture_coordinates_location,
         2, GL_FLOAT, GL_FALSE, 4 * sizeof(GL_FLOAT), BUFFER_OFFSET(2 * sizeof(GL_FLOAT)));
-    
+
+    // pin variables
     glEnableVertexAttribArray(a_position_location);
     glEnableVertexAttribArray(a_texture_coordinates_location);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
- 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // we already swapframe in main renderloop()!
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // draw binded VBO buffer
+
+    // release VBO, texture and program
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glActiveTexture(0); // error on piglet !!
+    glUseProgram(0);
+
+    // we already flip/swap
 }

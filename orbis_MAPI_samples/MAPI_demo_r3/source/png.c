@@ -45,6 +45,7 @@ static GLuint load_texture(
     glTexImage2D(GL_TEXTURE_2D, 0, type, width, height, 0, type, GL_UNSIGNED_BYTE, pixels);
 
 #endif
+
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return texture_object_id;
