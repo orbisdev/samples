@@ -151,7 +151,7 @@ void es2sample_init( void )
 {
     font_manager = font_manager_new( 512, 512, LCD_FILTERING_ON );
     buffer       = text_buffer_new( );
-debugNetPrintf(DEBUG,"font_manager: %p, buffer: %p\n",  font_manager, buffer);
+    //debugNetPrintf(DEBUG,"font_manager: %p, buffer: %p\n",  font_manager, buffer);
 
     vec4 black  = {{0.0, 0.0, 0.0, 1.0}};
     vec4 white  = {{1.0, 1.0, 1.0, 1.0}};
