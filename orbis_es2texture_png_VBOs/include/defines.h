@@ -8,8 +8,10 @@
 
 #ifdef HAVE_SHACC
     #include "icons_shaders.h"
+    #include "sprite_shaders.h"
 #else
     #include "icons_binary_shaders.h"
+    #include "sprite_binary_shaders.h"
 #endif
 
 
