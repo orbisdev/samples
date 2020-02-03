@@ -29,6 +29,7 @@
 
 /// to apply glow effect on selected icon
 extern int  selected_icon; // from icons.c
+extern vec2 p1_pos;        // from sprite.c
 
 bool flag=true;
 
@@ -85,17 +86,20 @@ void updateController()
         if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
         {
             debugNetPrintf(DEBUG,"Up pressed\n");
+            p1_pos.y += 0.01;
             //pad_special(2);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
         {
             debugNetPrintf(DEBUG,"Down pressed\n");
+            p1_pos.y -= 0.01;
             //pad_special(3);
         }
         if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
         {
             debugNetPrintf(DEBUG,"Right pressed\n");
             selected_icon++;
+            p1_pos.x += 0.01;
             sceKernelUsleep(5000);
             //pad_special(1);
         }
@@ -103,6 +107,7 @@ void updateController()
         {
             debugNetPrintf(DEBUG,"Left pressed\n");
             selected_icon--;
+            p1_pos.x -= 0.01;
             sceKernelUsleep(5000);
             //pad_special(0);
         }
@@ -243,9 +248,13 @@ static bool main_loop(void)
 
         /// update
         on_GLES2_Update((float)frame);
+        on_GLES2_Update_sprite(frame);
 
         /// draw: render all textured VBOs
         for(int i=0; i < NUM_OF_TEXTURES; i++) on_GLES2_Render(i); // background + icons
+
+        /// draw: render one sprite from one texture
+        on_GLES2_Render_sprite(frame);
 
         /// get timing, fps
         if(frame %WEN == 0)
@@ -302,6 +311,7 @@ int main(int argc, char *argv[])
 
     /// build shaders, setup initial state, etc.
     on_GLES2_Init(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
+    on_GLES2_Init_sprite(ATTR_ORBISGL_WIDTH, ATTR_ORBISGL_HEIGHT);
 
     /// reset timer
     time_ms = get_time_ms();
@@ -317,7 +327,7 @@ int main(int argc, char *argv[])
     /* destructors */
 
     on_GLES2_Final();
-
+    on_GLES2_Final_sprite();
     orbisAudioPause(0);
     Mod_End();
 

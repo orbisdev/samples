@@ -98,6 +98,8 @@ GLuint CreateProgramFromBinary(unsigned int i) //const char *vShader, const char
         /* icons_binary_shaders.h */
         case 0:  fShader = &fShader0; break;
         case 1:  fShader = &fShader1; break;
+        /* sprite_binary_shaders.h */
+        case 2:  fShader = &fShader2; break;
         /* more SL program pairs to add ! */
     }
     glShaderBinary( 1, &vertexShader,   2, (const GLvoid*)&vShader, vShader_len[0]);
