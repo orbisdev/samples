@@ -1,6 +1,8 @@
 # linux_es2goodness, a GLES2 playground
 
 
+![output](https://user-images.githubusercontent.com/8250079/75297125-499db180-582f-11ea-8107-8b64000e270c.gif)
+
 So you'd like to:
 - draw some Freetype texts
 - in OpenGL ES 2.0 (GLES2)
@@ -62,4 +64,3 @@ linux_es2goodness # make -f sprite.makefile && ./egl_demo_sprite
 
 ![a](https://user-images.githubusercontent.com/8250079/75284913-ee12fa00-5815-11ea-8e8e-6c92cd18269f.png)
 ![a](https://user-images.githubusercontent.com/8250079/75290411-8ca45880-5820-11ea-9f33-56bfada9d4b9.png)
-
