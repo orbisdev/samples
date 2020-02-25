@@ -7,7 +7,7 @@ INC=-I$(PS4SDK)/include/freetype-gl2 \
 	-Iinc
 
 
-EXE := egl_demo
+EXE := egl_demo_text_ani
 
 SRC_DIR := $(PS4SDK)/../liborbis/portlibs/libfreetype-gl2/source
 OBJ_DIR := obj
@@ -16,10 +16,10 @@ SRC := egl.c fileIO.c shader_common.c demo-font.c text_ani.c
 SRC += $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-CC 		 := clang
-CPPFLAGS := -Iinclude
+CC       := clang
+CPPFLAGS := 
 CFLAGS   := -Wall -O3
-LDLIBS   := -lX11 -lEGL -lGLESv2 -lm -lfreetype
+LDLIBS   := -lX11 -lEGL -lGLESv2 -lm -lfreetype -D_FT_DEMO_
 
 .PHONY: all clean
 
