@@ -41,7 +41,7 @@ _Since GL code is the same, I'm building libfreetype-gl from orbisdev/liborbis/p
 
 ### what really needs?
 
-```
+```bash
 linux_es2goodness # readelf -d egl_demo | grep NEEDED
  0x0000000000000001 (NEEDED)             Shared library: [libX11.so.6]
  0x0000000000000001 (NEEDED)             Shared library: [libEGL.so.1]
@@ -53,8 +53,13 @@ linux_es2goodness # readelf -d egl_demo | grep NEEDED
 
 ### make liborbis
 
-```sh
+```bash
 linux_es2goodness # make -f text_ani.makefile && ./egl_demo_text_ani
 
 linux_es2goodness # make -f sprite.makefile && ./egl_demo_sprite
 ```
+
+
+![a](https://user-images.githubusercontent.com/8250079/75284913-ee12fa00-5815-11ea-8e8e-6c92cd18269f.png)
+![a](https://user-images.githubusercontent.com/8250079/75290411-8ca45880-5820-11ea-9f33-56bfada9d4b9.png)
+
