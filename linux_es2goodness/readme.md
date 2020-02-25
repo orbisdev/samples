@@ -50,3 +50,11 @@ linux_es2goodness # readelf -d egl_demo | grep NEEDED
  0x0000000000000001 (NEEDED)             Shared library: [libfreetype.so.6]
  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
 ```
+
+### make liborbis
+
+```sh
+linux_es2goodness # make -f text_ani.makefile && ./egl_demo_text_ani
+
+linux_es2goodness # make -f sprite.makefile && ./egl_demo_sprite
+```
