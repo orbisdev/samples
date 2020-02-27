@@ -1,6 +1,6 @@
-# make -f text_ani.makefile
-# make -f text_ani.makefile clean
-# make -f text_ani.makefile && ./egl_demo
+# make -f sprite.makefile
+# make -f sprite.makefile clean
+# make -f sprite.makefile && ./egl_demo
 
 INC=-Iinc
 

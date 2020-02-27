@@ -24,6 +24,9 @@
 #include  <EGL/egl.h>
 
 
+#include "defines.h" // the parts list
+
+
 //extern int selected_icon;   // from texture.c
 int selected_icon;
 int is_facing_left;  // from  sprite.c
@@ -228,7 +231,7 @@ void render()
 
 #elif defined _SPRITE_
     on_GLES2_Render_sprite(0);
-    if (num_frames %6 == 0)
+    if( !(num_frames %6) )
         on_GLES2_Update_sprite(num_frames /6);
 
 #elif defined _SOUND_
@@ -240,7 +243,7 @@ void render()
 #if defined _FT_DEMO_
     render_text();   // freetype demo-font.c, renders text just from init_
 
-    render_text3();  // freetype text_ani.c, shared VBO, draw just indexed texts
+    render_text_ext(NULL);  // freetype text_ani.c, shared VBO, draw just indexed texts
     es2update_text_ani(1.f);
 #endif
 
@@ -486,7 +489,7 @@ int main(int argc, char **argv)
 
 #if defined _FT_DEMO_
     // demo-font.c init
-    es2sample_init((int)window_width, (int)window_height);
+    es2init_text((int)window_width, (int)window_height);
 
   #if defined _SOUND_
     on_GLES2_Init_sound((int)window_width, (int)window_height);

@@ -49,11 +49,9 @@
 #endif
 
 
-//#include "MiniShader.h"   // miniCompileShaders
-
-#include "freetype-gl.h"  // on pc avoid glew
-
+//#include "MiniShader.h" // miniCompileShaders
 #include "defines.h"
+
 
 // ------------------------------------------------------- typedef & struct ---
 typedef struct {
@@ -274,9 +272,9 @@ static GLuint CreateProgram( void )
 extern float tl;
 static texture_font_t *font = NULL;
 // ------------------------------------------------------------------- main ---
-int es2sample_init (int width, int height)
+int es2init_text (int width, int height)
 {
-    printf("es2sample_init\n");
+    printf("es2init_text\n");
 
     size_t h; // text size in pt
 
