@@ -16,7 +16,7 @@
 precision mediump float;
 
 uniform sampler2D texture;
-uniform vec3      u_time;  // g_Time, ani_status, TOTAL_ANI_FRAMES
+uniform vec3      meta;  // g_Time, ani_status, TOTAL_ANI_FRAMES
 
 varying vec2  vTexCoord;
 varying vec4  fragColor;
@@ -27,23 +27,23 @@ varying float frame;
 
 void main(void)
 {
-    if(u_time.y >= .3) // CLOSED
+    if(meta.y >= .3) // CLOSED
     { gl_FragColor.a = 0.; return; }
 
     float a      = texture2D(texture, vTexCoord).a;
-    float step   = frame / u_time.z;
+    float step   = frame / meta.z;
     vec4  c1     = vec4( fragColor.rgb, fragColor.a*a );
         //c0     = vec4( c1.rgb, clamp(step, 0., c1.a ));
     gl_FragColor = c1;
 
     // follow ani_status
-    if(u_time.y == .2) // DEFAULT
+    if(meta.y == .2) // DEFAULT
     { return; }
 
-    if(u_time.y == .0) // IN
+    if(meta.y == .0) // IN
     { gl_FragColor.a = clamp(step, 0., c1.a ); return; }
 
-    if(u_time.y == .1) // OUT
+    if(meta.y == .1) // OUT
     { step           = 1. - step; // reverse value
       gl_FragColor.a = clamp(step, 0., c1.a ); return; }
 }

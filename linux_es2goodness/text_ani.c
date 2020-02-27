@@ -13,9 +13,8 @@
 #endif
 
 
-#include "freetype-gl.h"  // on pc avoid glew
-
 #include "defines.h"
+
 
 // ------------------------------------------------------- typedef & struct ---
 typedef struct {
@@ -40,11 +39,6 @@ static int    itemcount = 0;
 static struct item_entry item[4]; // max 4 structs
 
 // ------------------------------------------------------- global variables ---
-// shared, from demo-font.c
-extern GLuint           shader;           
-extern texture_atlas_t *atlas;
-extern vertex_buffer_t *buffer;
-
 // shader and locations
 static GLuint program    = 0; // default program
 static GLuint shader_fx  = 0; // text_ani.[vf]
@@ -59,36 +53,14 @@ static void reshape(int width, int height)
 }
 
 // ----------------------------------------------------------text animation ---
-/* each fx have those state */
-enum ani_states
-{
-    IN,
-    OUT,
-    DEFAULT,
-    CLOSED
-};
-/* hold the current state values */
-struct fx_entry
-{
-// GLuint program;
-    int   status, // current ani_states
-          fcount; // current framecount
-    float life;   // total duration in frames
-};
 
 
-#define NUM  (3)  // texts we append to shared VBO
-char *text[NUM] = 
-{ 
-    "text_ani on glsl",
-    "level++;",
-    "make#liborbis",
-};
+
 static int      selected = 0; // we draw one text at once
-struct fx_entry ani;          // the fx info
+static fx_entry_t ani;          // the fx info
 
 // ---------------------------------------------------------------- display ---
-void render_text3( void )
+void render_text_ext( fx_entry_t *_ani )
 {
     // we already clean in main renderloop()!
 
@@ -100,7 +72,7 @@ void render_text3( void )
         switch(ani.status) // setup for next fx
         {
             case CLOSED : ani.status = IN;      ani.life  =  30.; break; 
-            case IN     : ani.status = DEFAULT; ani.life  = 100.; break; 
+            case IN     : ani.status = DEFAULT; ani.life  = 200.; break;
             case OUT    : ani.status = CLOSED;  ani.life  =  80., 
             /* CLOSED reached: switch text! */  selected +=   1 ; break; 
             case DEFAULT: ani.status = OUT;     ani.life  =  24.; break; 
@@ -123,7 +95,7 @@ void render_text3( void )
         glUniformMatrix4fv( glGetUniformLocation( program, "model" ),      1, 0, model.data);
         glUniformMatrix4fv( glGetUniformLocation( program, "view" ),       1, 0, view.data);
         glUniformMatrix4fv( glGetUniformLocation( program, "projection" ), 1, 0, projection.data);
-        glUniform3f       ( glGetUniformLocation( program, "u_time"), 
+        glUniform3f       ( glGetUniformLocation( program, "meta"),
                 ani.fcount,
                 ani.status /10., // we use float on SL, swtching fx state
                 ani.life );
@@ -188,9 +160,9 @@ static void my_add_text( vertex_buffer_t * buffer, texture_font_t * font,
 static GLuint CreateProgram( void )
 {
 #if 1 /* we can use OrbisGl wrappers, or MiniAPI ones */
-    const char *vShader = orbisFileGetFileContent( "shaders/text_ani.vert" );
-    const char *fShader = orbisFileGetFileContent( "shaders/text_ani.frag" );
-    GLuint    programID = BuildProgram(vShader, fShader); // shader_common.c
+    const GLchar  *vShader = (void*) orbisFileGetFileContent( "shaders/text_ani.vert" );
+    const GLchar  *fShader = (void*) orbisFileGetFileContent( "shaders/text_ani.frag" );
+          GLuint programID = BuildProgram(vShader, fShader); // shader_common.c
 
 #endif /* include and links against MiniAPI library! */
     //programID = miniCompileShaders(s_vertex_shader_code, s_fragment_shader_code);
@@ -270,7 +242,7 @@ for (int i = 0; i < NUM; ++i)
     mat4_set_identity( &model );
     mat4_set_identity( &view );
     // attach our "time counter"
-    g_TimeSlot = glGetUniformLocation(shader_fx, "u_time");
+    g_TimeSlot = glGetUniformLocation(shader_fx, "meta");
 
     reshape(width, height);
 }
