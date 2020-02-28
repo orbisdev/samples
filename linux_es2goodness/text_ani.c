@@ -56,34 +56,45 @@ static void reshape(int width, int height)
 
 
 
-static int      selected = 0; // we draw one text at once
-static fx_entry_t ani;          // the fx info
+static int         selected = 0; // we draw one text at once
+static fx_entry_t *ani;          // the fx info
+
+
 
 // ---------------------------------------------------------------- display ---
-void render_text_ext( fx_entry_t *_ani )
+static void render_text_extended( int text_num, int type_num )
 {
     // we already clean in main renderloop()!
 
-    program     = shader_fx;
-    ani.fcount += 1;
+    //type_num = 1; // which fx_entry_t test
+
+    fx_entry_t *ani = &fx_entry[type_num],
+               *fx  = &fx_entry[0];
+    int t_n = ani - fx;
+
+    program         = shader_fx;
 #if 1
-    if(ani.fcount == ani.life) // looping ani_state, foreach text
+    if(ani->fcount >= ani->life) // looping ani_state, foreach text
     {
-        switch(ani.status) // setup for next fx
+        switch(ani->status) // setup for next fx
         {
-            case CLOSED : ani.status = IN;      ani.life  =  30.; break; 
-            case IN     : ani.status = DEFAULT; ani.life  = 200.; break;
-            case OUT    : ani.status = CLOSED;  ani.life  =  80., 
-            /* CLOSED reached: switch text! */  selected +=   1 ; break; 
-            case DEFAULT: ani.status = OUT;     ani.life  =  24.; break; 
+            case CLOSED : ani->status = IN;      ani->life  =  30.; break;
+            case IN     : ani->status = DEFAULT; ani->life  = 200.; break;
+            case DEFAULT: ani->status = OUT;     ani->life  =  40.; break;
+            case OUT    : ani->status = CLOSED;  ani->life  =  80., 
+            /* CLOSED reached: switch text! */   selected  +=   1 ; break;
         }
-        ani.fcount = 0; // reset framecount
+        ani->fcount = 0; // reset framecount
     }
 #endif
-
-    printf("program: %d [%3d] fx state: %.1f, frame: %3d/%3.f\r", 
-            program, ani.fcount, ani.status /10., ani.fcount, ani.life);
-
+/*
+    printf("program: %d [%d] fx state: %.1f, frame: %3d/%3.f %.3f\r", 
+            program, t_n,
+                     ani->status /10.,
+                     ani->fcount,
+                     ani->life,
+                     fmod(ani->status /10. + type_num /100., .02));
+*/
     glUseProgram   ( program );
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture  ( GL_TEXTURE_2D, atlas->id ); // rebind glyph atlas
@@ -95,10 +106,11 @@ void render_text_ext( fx_entry_t *_ani )
         glUniformMatrix4fv( glGetUniformLocation( program, "model" ),      1, 0, model.data);
         glUniformMatrix4fv( glGetUniformLocation( program, "view" ),       1, 0, view.data);
         glUniformMatrix4fv( glGetUniformLocation( program, "projection" ), 1, 0, projection.data);
-        glUniform3f       ( glGetUniformLocation( program, "meta"),
-                ani.fcount,
-                ani.status /10., // we use float on SL, swtching fx state
-                ani.life );
+        glUniform4f       ( glGetUniformLocation( program, "meta"), 
+                ani->fcount,
+                ani->status /10., // we use float on SL, swtching fx state
+                ani->life,
+                type_num    /10.);
 
         if(0) /* draw whole VBO (storing all added texts) */
         {
@@ -109,7 +121,8 @@ void render_text_ext( fx_entry_t *_ani )
             vertex_buffer_render_setup( buffer, GL_TRIANGLES ); // start draw
             
             //for(int j=0; j<itemcount; j+=1)  // draw all texts
-            int j = selected %NUM;
+            //int j = selected %NUM;
+            int j = text_num;
             {
                 // draw just text[j]
                 // iterate each char in text[j]
@@ -126,8 +139,25 @@ void render_text_ext( fx_entry_t *_ani )
     }
     glDisable( GL_BLEND ); 
 
+
+    ani->fcount    += 1;
     // we already swapframe in main renderloop()!
 }
+
+
+/* wrapper from main */
+void render_text_ext( fx_entry_t *_ani )
+{
+    //for (int i = 0; i < itemcount; ++i)
+    {
+    /*  render_text_extended( item_entry, fx_entry );
+        read as: draw this text using this effect! */
+        render_text_extended( 0, TYPE_0 );
+        render_text_extended( 1, TYPE_1 );
+        render_text_extended( 2, TYPE_2 );
+    }
+}
+
 
 /* shared freetype-gl function! */
 void add_text( vertex_buffer_t * buffer, texture_font_t * font,
@@ -197,16 +227,17 @@ void es2init_text_ani(int width, int height)
     vec2 pen   = {{ 200, 480 /2 }}; // init pen: 0,0 is lower left
     vec4 white = {{ 1.f, 1.f, 1.f, 1.f }}; // RGBA color
     vec4 col   = {{ 1.f, 0.f, 0.4, 1.f }}; // RGBA color
-	//buffer     = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
+    /* reuse main demo-font VBO! */
+	//buffer   = vertex_buffer_new( "vertex:3f,tex_coord:2f,color:4f" );
 
 for (int i = 0; i < NUM; ++i)
 {
-  // compose text VBOs
+    // now append all text to VBO and atlas
 
     // setup positions for each text we render later
 	texture_font_load_glyphs( font, text[i] );
 
-	// after texture_font_load_glyphs() calls, tl holds text len in pixels!
+	// after texture_font_load_glyphs() calls, 'tl' holds text len in pixels!
 	//pen.x  = (1024 - tl) /2; // use Text_Length to align pen.x 
     //pen.y -= 16;
 
@@ -234,14 +265,15 @@ for (int i = 0; i < NUM; ++i)
     if(!shader_fx) { printf("program creation failed\n"); }
 
     /* init ani effect */
-    ani.status = CLOSED,
-    ani.fcount =  0;     // framecount
-    ani.life   = 20.f;   // duration in frames
+    ani = &fx_entry[0];
+    ani->status = CLOSED,
+    ani->fcount =  0;     // framecount
+    ani->life   = 20.f;   // duration in frames
 
     mat4_set_identity( &projection );
     mat4_set_identity( &model );
     mat4_set_identity( &view );
-    // attach our "time counter"
+    // attach our "custom infos"
     g_TimeSlot = glGetUniformLocation(shader_fx, "meta");
 
     reshape(width, height);

@@ -6,17 +6,17 @@
 
   enum text_ani_state, as ani_status stage:
   {
+    CLOSED,
     IN,
-    OUT,
     DEFAULT,
-    CLOSED
+    OUT
   };
 */
 
 precision mediump float;
 
 uniform sampler2D texture;
-uniform vec3      meta;  // g_Time, ani_status, TOTAL_ANI_FRAMES
+uniform vec4      meta;  // g_Time, ani_status, TOTAL_ANI_FRAMES, type_num
 
 varying vec2  vTexCoord;
 varying vec4  fragColor;
@@ -27,9 +27,6 @@ varying float frame;
 
 void main(void)
 {
-    if(meta.y >= .3) // CLOSED
-    { gl_FragColor.a = 0.; return; }
-
     float a      = texture2D(texture, vTexCoord).a;
     float step   = frame / meta.z;
     vec4  c1     = vec4( fragColor.rgb, fragColor.a*a );
@@ -37,13 +34,22 @@ void main(void)
     gl_FragColor = c1;
 
     // follow ani_status
-    if(meta.y == .2) // DEFAULT
+    if(meta.y >= .3) // OUT
+    { step           = 1. - step; // reverse value
+      gl_FragColor.a = clamp(step, 0., c1.a );
+
+      if(meta.w == .1) gl_FragColor.rgb = vec3(1., .2, .2); // debug.r
+      return; }
+
+    if(meta.y >= .2) // DEFAULT
     { return; }
 
-    if(meta.y == .0) // IN
-    { gl_FragColor.a = clamp(step, 0., c1.a ); return; }
+    if(meta.y >= .1) // IN
+    { 
+      if(meta.w == .1) gl_FragColor.rgb = vec3(.2, 1., .2); // debug.r
 
-    if(meta.y == .1) // OUT
-    { step           = 1. - step; // reverse value
       gl_FragColor.a = clamp(step, 0., c1.a ); return; }
+
+    if(meta.y >= .0) // CLOSED
+    { gl_FragColor.a = 0.; return; }   
 }
