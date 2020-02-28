@@ -21,10 +21,18 @@ extern vertex_buffer_t *buffer;
 /* each fx have those states */
 enum ani_states
 {
+    CLOSED,
     IN,
-    OUT,
     DEFAULT,
-    CLOSED
+    OUT
+};
+
+enum ani_type_num
+{
+    TYPE_0,
+    TYPE_1,
+    TYPE_2,
+    MAX_ANI_TYPE
 };
 
 /* hold the current state values */
@@ -33,8 +41,12 @@ typedef struct
 // GLuint program;
     int   status, // current ani_states
           fcount; // current framecount
+
     float life;   // total duration in frames
 } fx_entry_t;
+
+
+static fx_entry_t fx_entry[MAX_ANI_TYPE];
 
 
 #define NUM  (3)  // texts we append to shared VBO
@@ -44,3 +56,4 @@ static char *text[NUM] =
     "level++;",
     "make#liborbis",
 };
+
