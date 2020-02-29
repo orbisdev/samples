@@ -32,6 +32,7 @@ enum ani_type_num
     TYPE_0,
     TYPE_1,
     TYPE_2,
+    TYPE_3,
     MAX_ANI_TYPE
 };
 
@@ -49,11 +50,12 @@ typedef struct
 static fx_entry_t fx_entry[MAX_ANI_TYPE];
 
 
-#define NUM  (3)  // texts we append to shared VBO
+#define NUM  (4)  // texts we append to shared VBO
 static char *text[NUM] = 
 { 
     "text_ani on glsl",
     "level++;",
     "make#liborbis",
+    "textline, TYPE_3"
 };
 

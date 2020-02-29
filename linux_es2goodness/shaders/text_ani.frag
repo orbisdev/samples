@@ -35,21 +35,28 @@ void main(void)
 
     // follow ani_status
     if(meta.y >= .3) // OUT
-    { step           = 1. - step; // reverse value
-      gl_FragColor.a = clamp(step, 0., c1.a );
+    {
+        step           = 1. - step; // reverse value
+        gl_FragColor.a = clamp(step, 0., c1.a );
 
-      if(meta.w == .1) gl_FragColor.rgb = vec3(1., .2, .2); // debug.r
-      return; }
-
+        if(meta.w == .1) gl_FragColor.rgb = vec3(1., .2, .2); // debug.r
+        return;
+    }
     if(meta.y >= .2) // DEFAULT
-    { return; }
+    {
+        if(meta.w == .2 ) { gl_FragColor.rgb = vec3(.0, .2, 1.); }
+        if(meta.w == .3 ) { gl_FragColor.a   = clamp(abs(sin(meta.x * .1)),
+                                                     0., c1.a); }
+        return; }
 
     if(meta.y >= .1) // IN
     { 
-      if(meta.w == .1) gl_FragColor.rgb = vec3(.2, 1., .2); // debug.r
+        if(meta.w == .1) gl_FragColor.rgb = vec3(.2, 1., .2); // debug.g
 
-      gl_FragColor.a = clamp(step, 0., c1.a ); return; }
-
+        gl_FragColor.a = clamp(step, 0., c1.a ); return;
+    }
     if(meta.y >= .0) // CLOSED
-    { gl_FragColor.a = 0.; return; }   
+    {
+        gl_FragColor.a = 0.; return;
+    }
 }

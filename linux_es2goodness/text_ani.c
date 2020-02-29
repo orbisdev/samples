@@ -79,9 +79,9 @@ static void render_text_extended( int text_num, int type_num )
         switch(ani->status) // setup for next fx
         {
             case CLOSED : ani->status = IN;      ani->life  =  30.; break;
-            case IN     : ani->status = DEFAULT; ani->life  = 200.; break;
-            case DEFAULT: ani->status = OUT;     ani->life  =  40.; break;
-            case OUT    : ani->status = CLOSED;  ani->life  =  80., 
+            case IN     : ani->status = DEFAULT; ani->life  = 240.; break;
+            case DEFAULT: ani->status = OUT;     ani->life  =  30.; break;
+            case OUT    : ani->status = CLOSED;  ani->life  =  60.,
             /* CLOSED reached: switch text! */   selected  +=   1 ; break;
         }
         ani->fcount = 0; // reset framecount
@@ -139,8 +139,8 @@ static void render_text_extended( int text_num, int type_num )
     }
     glDisable( GL_BLEND ); 
 
-
     ani->fcount    += 1;
+
     // we already swapframe in main renderloop()!
 }
 
@@ -155,6 +155,7 @@ void render_text_ext( fx_entry_t *_ani )
         render_text_extended( 0, TYPE_0 );
         render_text_extended( 1, TYPE_1 );
         render_text_extended( 2, TYPE_2 );
+        render_text_extended( 3, TYPE_3 );
     }
 }
 
@@ -223,7 +224,7 @@ void es2init_text_ani(int width, int height)
 
     /* reuse texture_atlas! */
     //if(!atlas) atlas  = texture_atlas_new( 512, 512, 1 );
-	font 	   = texture_font_new_from_memory(atlas, 32, ttf, _orbisFile_lastopenFile_size);
+         font  = texture_font_new_from_memory(atlas, 32, ttf, _orbisFile_lastopenFile_size);
     vec2 pen   = {{ 200, 480 /2 }}; // init pen: 0,0 is lower left
     vec4 white = {{ 1.f, 1.f, 1.f, 1.f }}; // RGBA color
     vec4 col   = {{ 1.f, 0.f, 0.4, 1.f }}; // RGBA color
@@ -240,6 +241,7 @@ for (int i = 0; i < NUM; ++i)
 	// after texture_font_load_glyphs() calls, 'tl' holds text len in pixels!
 	//pen.x  = (1024 - tl) /2; // use Text_Length to align pen.x 
     //pen.y -= 16;
+    if(i == TYPE_3) pen = (vec2){ 10, 64 };
 
     my_add_text( buffer, font, text[i], &white, &pen, &item[i] );
 }
