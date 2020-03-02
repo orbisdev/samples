@@ -275,10 +275,10 @@ int main(int argc, char *argv[])
     /// reset timer
     time_ms = get_time_ms();
 
-	/* mp3 audio, from nfs export
+	// mp3 audio, from nfs export
     user_init();   // nfs
 
-    ret = dr_mp3_Load("main.mp3");
+    /*ret = dr_mp3_Load("main.mp3");
     if(ret) dr_mp3_Play();
 
     orbisAudioResume(0); */
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
 	//orbisAudioPause(0);
     //orbisAudioStop();
     //dr_mp3_End();
-    //user_end(); // nfs
+    user_end(); // nfs
 
 	finishApp();
 
