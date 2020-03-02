@@ -40,6 +40,119 @@ typedef struct OrbisGlobalConf
 
 OrbisGlobalConf *myConf;
 
+int screenStatus;
+
+void updateController()
+{
+    int ret;
+    unsigned int buttons=0;
+    ret=orbisPadUpdate();
+    if(ret==0)
+    {
+        if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"Combo L2R2 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L2|ORBISPAD_R2);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R1) )
+        {
+            debugNetPrintf(DEBUG,"Combo L1R1 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L1|ORBISPAD_R1);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L1|ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"Combo L1R2 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L1|ORBISPAD_R2);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R1) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R1) )
+        {
+            debugNetPrintf(DEBUG,"Combo L2R1 pressed\n");
+            buttons=orbisPadGetCurrentButtonsPressed();
+            buttons&= ~(ORBISPAD_L2|ORBISPAD_R1);
+            orbisPadSetCurrentButtonsPressed(buttons);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
+        {
+            debugNetPrintf(DEBUG,"Up pressed\n");
+            //pad_special(2);
+            switch(screenStatus)
+            {
+            	case SCREEN_BROWSER: orbisNfsBrowserEntryUp(); selected_entry(NULL); break;
+            }
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
+        {
+            debugNetPrintf(DEBUG,"Down pressed\n");
+            //pad_special(3);
+            switch(screenStatus)
+            {
+            	case SCREEN_BROWSER: orbisNfsBrowserEntryDown(); selected_entry(NULL); break;
+            }
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
+        {
+            debugNetPrintf(DEBUG,"Right pressed\n");
+            //pad_special(1);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
+        {
+            debugNetPrintf(DEBUG,"Left pressed\n");
+            //pad_special(0);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
+        {
+            debugNetPrintf(DEBUG,"Triangle pressed exit\n");
+            screenStatus = SCREEN_CREDITS;
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
+        {
+            debugNetPrintf(DEBUG,"Circle pressed\n");
+            orbisAudioResume(0);
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_CROSS))
+        {
+            debugNetPrintf(DEBUG,"Cross pressed rand color\n");
+            //orbisAudioStop();
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_SQUARE))
+        {
+            debugNetPrintf(DEBUG,"Square pressed\n");
+            orbisAudioPause(0);
+            screenStatus = SCREEN_BROWSER;
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L1))
+        {
+            debugNetPrintf(DEBUG,"L1 pressed\n");
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_L2))
+        {
+            debugNetPrintf(DEBUG,"L2 pressed\n");
+            flag=0;  // exit app
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_R1))
+        {
+            debugNetPrintf(DEBUG,"R1 pressed\n");
+        }
+        if(orbisPadGetButtonPressed(ORBISPAD_R2))
+        {
+            debugNetPrintf(DEBUG,"R2 pressed\n");
+
+           	char *t = calloc(256, 1); selected_entry(t);
+
+           	debugNetPrintf(DEBUG,"t:'%s'\n", t);
+
+            /* dr_mp3_Loop(t); */
+
+            free(t), t = NULL;
+        }
+    }
+}
 
 OrbisGlTextureState *browserTexture=NULL;
 OrbisGlTextureState *folderTexture=NULL;
@@ -50,260 +163,12 @@ OrbisGlProgram *programTexture=NULL;
 char path[256];
 int notSelected=1;
 int comeBack=0;
-int posy=0;
-int posx=0;
-vec4 color;
-int flagfolder=0;
-int screenStatus;
-
-OrbisNfsBrowserListEntry *currentEntry;
-
-void updateController()
-{
-	int ret;
-	unsigned int buttons=0;
-	ret=orbisPadUpdate();
-	if(ret==0)
-	{
-		if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"Combo L2R2 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L2|ORBISPAD_R2);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R1) )
-		{
-			debugNetPrintf(DEBUG,"Combo L1R1 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L1|ORBISPAD_R1);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1|ORBISPAD_R2) || orbisPadGetButtonHold(ORBISPAD_L1|ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"Combo L1R2 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L1|ORBISPAD_R2);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L2|ORBISPAD_R1) || orbisPadGetButtonHold(ORBISPAD_L2|ORBISPAD_R1) )
-		{
-			debugNetPrintf(DEBUG,"Combo L2R1 pressed\n");
-			buttons=orbisPadGetCurrentButtonsPressed();
-			buttons&= ~(ORBISPAD_L2|ORBISPAD_R1);
-			orbisPadSetCurrentButtonsPressed(buttons);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_UP) || orbisPadGetButtonHold(ORBISPAD_UP))
-		{
-			debugNetPrintf(DEBUG,"Up pressed\n");
-			orbisNfsBrowserEntryUp();
-			currentEntry=orbisNfsBrowserListGetNthEntry(orbisNfsBrowserGetBasePos()+orbisNfsBrowserGetRelPos());
-			if(currentEntry!=NULL)
-			{
-				debugNetPrintf(INFO,"[NFSSAMPLE] current entry %s\n",currentEntry->dir->name);
-			}
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_DOWN) || orbisPadGetButtonHold(ORBISPAD_DOWN))
-		{
-			debugNetPrintf(DEBUG,"Down pressed\n");
-			debugNetPrintf(DEBUG," before entry down level=%d base=%d rel=%d\n",orbisNfsBrowserGetDirLevel(),orbisNfsBrowserGetBasePos(),orbisNfsBrowserGetRelPos());
-			
-			orbisNfsBrowserEntryDown();
-			debugNetPrintf(DEBUG," after entry down level=%d base=%d rel=%d\n",orbisNfsBrowserGetDirLevel(),orbisNfsBrowserGetBasePos(),orbisNfsBrowserGetRelPos());
-			
-			currentEntry=orbisNfsBrowserListGetNthEntry(orbisNfsBrowserGetBasePos()+orbisNfsBrowserGetRelPos());
-			if(currentEntry!=NULL)
-			{
-				debugNetPrintf(INFO,"current entry %s\n",currentEntry->dir->name);
-			}
-			else
-			{
-				debugNetPrintf(INFO,"current entry chunga\n");
-				
-			}
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_RIGHT) || orbisPadGetButtonHold(ORBISPAD_RIGHT))
-		{
-			debugNetPrintf(DEBUG,"Right pressed\n");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_LEFT) || orbisPadGetButtonHold(ORBISPAD_LEFT))
-		{
-			debugNetPrintf(DEBUG,"Left pressed\n");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_TRIANGLE))
-		{
-			debugNetPrintf(DEBUG,"Triangle pressed exit\n");
-			showCredits();
-			orbisGlTextClearBuffer();
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			if(browserTexture)
-			{
-				orbisGlDrawTexture(browserTexture);
-			}
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_CIRCLE))
-		{
-			debugNetPrintf(DEBUG,"Circle pressed\n");            
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_CROSS))
-		{
-			debugNetPrintf(DEBUG,"Cross pressed rand color\n");
-			notSelected=0;
-			debugNetPrintf(DEBUG,"cross level=%d base=%d rel=%d\n",orbisNfsBrowserGetDirLevel(),orbisNfsBrowserGetBasePos(),orbisNfsBrowserGetRelPos());
-			
-			//entry=orbisNfsBrowserListGetNthEntry(orbisNfsBrowserGetBasePos()+orbisNfsBrowserGetRelPos());					
-			currentEntry=orbisNfsBrowserListGetNthEntry(orbisNfsBrowserGetBasePos()+orbisNfsBrowserGetRelPos());
-
-			if(currentEntry!=NULL)
-			{
-				
-				debugNetPrintf(INFO,"cross current entry %s customtype=%d\n",currentEntry->dir->name,currentEntry->dir->customtype);
-				
-				switch(currentEntry->dir->customtype)
-				{	
-					case FILE_TYPE_FOLDER:
-						notSelected=1;
-						//if(strcmp(currentEntry->dir->name, ".") == 0)
-						//{
-						//	flagfolder=1;
-						//}
-						//else
-						//{
-							//if(strcmp(currentEntry->dir->name, ".")!=0)
-							//{
-								debugNetPrintf(DEBUG,"cross selected folder level=%d base=%d rel=%d\n",orbisNfsBrowserGetDirLevel(),orbisNfsBrowserGetBasePos(),orbisNfsBrowserGetRelPos());
-								
-								//orbisFileBrowserDirLevelUp(currentEntry->dir->name);
-								//debugNetPrintf(DEBUG,"cross selected folder level=%d base=%d rel=%d\n",orbisFileBrowserGetDirLevel(),orbisFileBrowserGetBasePos(),orbisFileBrowserGetRelPos());
-								flagfolder=1;
-								//}
-						//}
-						break;
-					case FILE_TYPE_GAME_ROM:
-						
-						//if(extension==FILE_TYPE_GAME_ROM)
-						//{
-							sprintf(path,"%s/%s",orbisNfsBrowserGetListPath(),currentEntry->dir->name);
-							debugNetPrintf(DEBUG,"cross selected entry game %s\n",path);
-							
-							debugNetPrintf(DEBUG,"change cart\n");
-							//actionCartInsertFromHost(path,0);
-
-							//screenStatus=SCREEN_EMU;
-							//LoadCart(path,slot,MAP_GUESS);
-							//}
-						//else
-						//{
-						//	debugNetPrintf(INFO,"wrong extension choose the right one\n");
-							//}
-						break;
-					case FILE_TYPE_GAME_DSK:
-						//if(extension==FILE_TYPE_GAME_DSK)
-						//{
-						
-							sprintf(path,"%s/%s",orbisNfsBrowserGetListPath(),currentEntry->dir->name);
-							//LoadFileDrive(path,drive);
-							debugNetPrintf(DEBUG,"change disk\n");
-							//actionDiskInsertFromHost(path,0);
-							//screenStatus=SCREEN_EMU;
-
-							//}
-						//else
-						//{
-						//	debugNetPrintf(INFO,"wrong extension choose the right one\n");
-							//}
-						break;
-					case FILE_TYPE_CAS:
-					//	if(extension==FILE_TYPE_CAS)
-					//	{
-							sprintf(path,"%s/%s",orbisNfsBrowserGetListPath(),currentEntry->dir->name);
-							//ChangeTape(path);
-							debugNetPrintf(DEBUG,"change cas\n");
-							
-					//	}
-					//	else
-					//	{
-					//		debugNetPrintf(INFO,"wrong extension choose the right one\n");
-					//	}
-						break;
-					default:
-						debugNetPrintf(DEBUG,"wrong extension come back\n");
-						comeBack=1;
-						break;
-				}
-			}
-
-			//orbisAudioStop();
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_SQUARE))
-		{
-			debugNetPrintf(DEBUG,"Square pressed\n");
-			//orbisAudioPause(0);
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L1))
-		{
-			debugNetPrintf(DEBUG,"L1 pressed\n");
-			debugNetPrintf(3,"%s %d\n",orbisNfsBrowserGetListPath(),strlen(orbisNfsBrowserGetListPath()));
-
-			//whoami();
-			//debugNetPrintf(DEBUG,"calling myfuseloader in kernel land %d\n",syscall(11,myfuseloader505));
-			// showdir("/data/tmp");
-			//             showdir("/data/tmp/app");
-			
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_L2))
-		{
-			debugNetPrintf(DEBUG,"L2 pressed\n");
-			//showfusedevice("/dev/fuse0");
-			//showfusedevice("/data/tmp");
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_R1))
-		{
-			debugNetPrintf(DEBUG,"R1 pressed\n");
-			debugNetPrintf(3,"[NFSSAMPLE] %s opening fusenfs.txt from nfs server\n",__FUNCTION__);
-			int dfd=orbisNfsOpen("MSX.ROM",O_RDONLY,0);
-			debugNetPrintf(3,"[NFSSAMPLE] %s  open return 0x%08X\n",__FUNCTION__,dfd);
-			if(dfd>=0)
-			{
-				int size=orbisNfsLseek(dfd,0,SEEK_END);
-				if(size>0)
-				{
-					debugNetPrintf(3,"[NFSSAMPLE] %s  lseek return 0x%08X\n",__FUNCTION__,size);
-					orbisNfsLseek(dfd,0,SEEK_SET);
-					debugNetPrintf(3,"[NFSSAMPLE] %s  reading %d bytes\n",__FUNCTION__,size);
-					char * buf=malloc(size);
-					ret=orbisNfsRead(dfd,buf,size);
-					if(ret)
-					{
-						//debugNetPrintf(3,"[NFSSAMPLE] %s\n",buf);
-						debugNetPrintf(3,"[NFSSAMPLE] %d bytes read\n",ret);
-						int fd=orbisNfsOpen("MSXC.ROM",O_RDWR|O_CREAT,0644);
-						if(fd>=0)
-						{
-							ret=orbisNfsWrite(fd,buf,size);
-							debugNetPrintf(3,"[NFSSAMPLE] %d bytes written\n",ret);
-							orbisNfsClose(fd);
-						}
-					}
-				}
-				debugNetPrintf(3,"[NFSSAMPLE] %s closing file /hostapp/fusenfs.txt \n",__FUNCTION__);
-				orbisNfsClose(dfd);
-			}
-		}
-		if(orbisPadGetButtonPressed(ORBISPAD_R2))
-		{
-			debugNetPrintf(DEBUG,"R2 pressed\n");
-			// debugNetPrintf(DEBUG,"orbisKernelLand return from syscall %d\n",syscall(11,orbisKernelLand));
-		}
-	}
-}
 
 void finishApp()
 {
 	//orbisAudioFinish();
 	//orbisKeyboardFinish();
-	orbisGlFinish();
+	orbisGlFinish();	// needs orbisFile
 	orbisPadFinish();
 	orbisNfsFinish();
 	ps4LinkFinish();
@@ -355,168 +220,13 @@ bool initApp()
 	return true;
 }
 
-void getSizeString(char string[8],char string1[3], uint64_t size) 
-{
-	double double_size = (double)size;
+/// for timing, fps
+#define WEN  (4096)
+unsigned int frame   = 1,
+             time_ms = 0;
 
-	int i = 0;
-	static char *units[] = { "B ", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-	while (double_size >= 1024.0) {
-		double_size /= 1024.0;
-		i++;
-	}
-	//char string1[16];
-	snprintf(string, 8, "%.*f",(i == 0) ? 0 : 2, double_size);
-	snprintf(string1, 3, "%s",units[i]);
-	//debugNetPrintf(DEBUG,"%s %d\n",string,strlen(string));
-	//debugNetPrintf(DEBUG,"%s %d\n",string1,strlen(string1));
 
-	//snprintf(string, 16, "%.*f %s",  2, double_size, units[i]);
 
-}
-
-void browserDrawText()
-{
-	vec4 color;
-	color.r=255.0;
-	color.g=255.0;
-	color.b=255.0;
-	color.a=1.0;
-
-	orbisGlTextDrawBuffer("Browser",30+posx,52+15+posy,color);
-	orbisGlTextDrawBuffer("Back",90-22+posx,1000+34+posy,color);
-	orbisGlTextDrawBuffer("Browser",100+90-22+64,1000+34+posy,color);
-	orbisGlTextDrawBuffer("Credits",220+90-22+64+79,1000+34+posy,color);
-	orbisGlTextDrawBuffer("Select",340+90-22+64+79+79,1000+34+posy,color);
-
-}
-void browserDraw()
-{
-	int i=0;
-	uint32_t f1 ,f2;
-	char dateString[20]; 
-	char sizeString[8];
-	char unitString[3];
-	char mypath[256];
-	orbisGlTextClearBuffer();
-	browserDrawText();
-	if(flagfolder==1 && currentEntry)
-	{
-		if(strcmp(currentEntry->dir->name,".")!=0)
-		{
-			debugNetPrintf(DEBUG,"go to new directory %s\n",currentEntry->dir->name);
-			//char rootpath[256];
-			//sprintf(rootpath,"%s/%s",orbisNfsBrowserGetListPath(),currentEntry->dir->name);
-			//debugNetPrintf(DEBUG,"go to new directory %s\n",rootpath);
-			if(strcmp(currentEntry->dir->name,"..")!=0)
-			{
-				orbisNfsBrowserDirLevelUp(currentEntry->dir->name);
-			}
-			else
-			{
-				orbisNfsBrowserDirLevelDown();
-			}
-			debugNetPrintf(DEBUG,"after orbisNfsBrowserDirLevelUp\n");
-		}
-		else
-		{
-			orbisNfsBrowserListRefresh();
-		}
-		flagfolder=0;
-		
-	}
-	OrbisNfsBrowserListEntry *entry=orbisNfsBrowserListGetNthEntry(orbisNfsBrowserGetBasePos());
-	
-	
-		
-	while(entry && i<MAX_ENTRIES)
-	{
-			
-		if(entry->dir->customtype==FILE_TYPE_FOLDER)
-		{
-			if(folderTexture)
-			{
-				//orbisGlDraw(programTextureId,folderTextureId,30,90+i*20);
-				orbisGlDrawTextureSpecial(folderTexture,30,90+i*30+1+67-30-15);
-	
-			}
-			//sprintf(sizeString,"%s","FOLDER");
-			getSizeString(sizeString,unitString,entry->dir->size);
-
-				
-		}
-		else
-		{
-			if(fileTexture)
-			{
-				//orbisGlDraw(programTextureId,fileTextureId,30,90+i*20+2);	
-				orbisGlDrawTextureSpecial(fileTexture,30,90+i*30+1+67-30-15);
-
-			}
-			getSizeString(sizeString,unitString,entry->dir->size);
-		}
-		//debugNetPrintf(DEBUG,("%s %d\n",entry->name,entry->type);
-		if(i==orbisNfsBrowserGetRelPos())
-		{
-				
-			/*f1 = 0xFF24FFBD;
-			f2 = 0xFF24FFBD;
-			update_gradient(&f1, &f2);*/
-			color.r=36.0/255.0;
-			color.g=1.0;
-			color.b=189.0/255.0;
-			color.a=1.0;
-								
-		}
-		else
-		{
-			/*f1 = 0x80FFFFFF;
-			f2 = 0x80FFFFFF;
-			update_gradient(&f1, &f2);*/
-			color.r=1.0;
-			color.g=1.0;
-			color.b=1.0;
-			color.a=1.0;
-		}
-		//print_text(50+posx,90+i*20+posy,entry->dir->name);
-		orbisGlTextDrawBuffer(entry->dir->name,60,90+i*30+1+67-30,color);
-		
-		sprintf(dateString,"%02d/%02d/%04d %02d:%02d %s",
-		entry->dir->mtime.day,
-		entry->dir->mtime.month,
-		entry->dir->mtime.year,
-		entry->dir->mtime.hour>12?entry->dir->mtime.hour-12:entry->dir->mtime.hour,
-		entry->dir->mtime.minute,
-		entry->dir->mtime.hour>=12? "PM" : "AM");	
-		orbisGlTextDrawBuffer(dateString,740+960+8-15-35,90+i*30+1+67-30,color);
-		//orbisGlTextDraw(" hello world",740+960+8-15-35,90+i*30+1+67-30,color);
-
-		orbisGlTextDrawBuffer(unitString,740+960-8-15-35-22*2,90+i*30+1+67-30,color);
-		orbisGlTextDrawBuffer(sizeString,740+960-8-15-35-22*7,90+i*30+1+67-30,color);
-				
-		entry=entry->next;	
-		i++;			
-			
-	}
-	//f1 = 0xFF24FFBD,f2 = 0xFF24FFBD;
-	//update_gradient(&f1, &f2);
-	color.r=1.0;//36.0/255.0;
-	color.g=0.1;//1.0;
-	color.b=0.1;//189.0/255.0;
-	color.a=1.0;
-	char *aux=orbisNfsBrowserGetListPath();
-	if(aux[0]=='.' && strlen(aux)<=2)
-	{
-		snprintf(mypath,256,"%s","nfs:/");
-	}
-	else
-	{
-		char *aux1=orbisNfsBrowserGetListPath();
-		snprintf(mypath,256,"%s%s","nfs:/",&aux1[2]);
-	}
-	orbisGlTextDrawBuffer(mypath,30,52+76-30+2,color);
-	orbisGlTextDraw();
-}
 
 void textureRegister()
 {
@@ -532,11 +242,16 @@ void textureRegister()
 		creditsTexture=orbisGlInitTexture("credits",CREDITS_BACKGROUND_FILE_PATH,programTexture,ATTR_ORBISGL_WIDTH,ATTR_ORBISGL_HEIGHT);
 
 	}
-	orbisGlTextInit();
-	debugNetPrintf(DEBUG,"[NFSSAMPLE] %s registered\n",__FUNCTION__);
-
-    
+	//orbisGlTextInit(); <-- twice ?!
+	debugNetPrintf(DEBUG,"[NFSSAMPLE] %s registered\n",__FUNCTION__); 
 }
+
+#include "orbisGlText.h"
+/* basic "group of texts" indexing */
+extern textline_t   t_credits, // credits.c
+					t_footer,  // credits.c
+					t_browser; // browser.c
+
 int main(int argc, char *argv[])
 {
 	int ret;
@@ -551,20 +266,75 @@ int main(int argc, char *argv[])
 	sleep(1);
 	// init libraries
 	flag=initApp();
-	textureRegister();
+	
+    // GLES2 init, defaults
+	textureRegister(); // all textures
+	orbisGlTextInit(); // all texts
+	screenStatus=SCREEN_CREDITS;
+
+    /// reset timer
+    time_ms = get_time_ms();
+
+	// mp3 audio, from nfs export
+    user_init();   // nfs
+
+    /*ret = dr_mp3_Load("main.mp3");
+    if(ret) dr_mp3_Play();
+
+    orbisAudioResume(0); */
+
+    /// enter main render loop
 	while(flag)
 	{
+        updateController();
 
-		if(browserTexture)
-		{
-			orbisGlDrawTexture(browserTexture);
-		}
-		updateController();
-		browserDraw();
-		orbisGlSwapBuffers();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        ret = glGetError();
+        if (ret) {
+            debugNetPrintf(ERROR,"[ORBIS_GL] glClear failed: 0x%08X\n", ret);
+            //goto err;
+        }
+        /// get timing, fps
+        if(frame %WEN == 0)
+        {
+            unsigned int now = get_time_ms();
+            debugNetPrintf(INFO,"frame: %d, took: %ums, fps: %.3f\n", frame, now - time_ms,
+                                                     ((double)WEN / (double)(now - time_ms) * 1000.f));
+            time_ms = now;
+        }
+        frame++;
+
+        switch(screenStatus)
+        {
+        	case SCREEN_CREDITS:
+        	{
+        	  if(creditsTexture) orbisGlDrawTexture(creditsTexture);
+        	  orbisGlTextDraw(&t_credits);
+        	  orbisGlTextDraw(&t_footer);
+        	  break;
+        	}
+        	case SCREEN_BROWSER:
+        	{
+        	  if(browserTexture)  orbisGlDrawTexture(browserTexture);
+        	  // draw browser
+        	  orbisGlTextDraw(&t_browser);
+        	  orbisGlTextDraw(&t_footer);
+        	  break;
+        	}
+    	}
+
+        orbisGlSwapBuffers();  /// flip frame
+
+        sceKernelUsleep(10000);
 	}
+
+	//orbisAudioPause(0);
+    //orbisAudioStop();
+    //dr_mp3_End();
+    user_end(); // nfs
+
 	finishApp();
-	sleep(3);
+
 	exit(EXIT_SUCCESS);
 }
