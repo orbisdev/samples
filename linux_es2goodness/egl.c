@@ -481,7 +481,7 @@ int main(int argc, char **argv)
         InitScene_4((int)window_width, (int)window_height);
         sleep(2);
     #endif
-    
+
 #elif defined _ICONS_
 // sprite.c init
     on_GLES2_Init_icons((int)window_width, (int)window_height);
