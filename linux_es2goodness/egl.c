@@ -224,8 +224,11 @@ void render()
         DrawScene_4();
         //UpdateScene_3(0.02);
     #endif
-    
-    #include "texture.h"
+
+#elif defined _ICONS_
+    /// update
+    on_GLES2_Update(num_frames);
+
     // render all textures VBOs
     for(int i=0; i < NUM_OF_TEXTURES; i++) on_GLES2_Render(i); // skip background
 
@@ -479,6 +482,13 @@ int main(int argc, char **argv)
         sleep(2);
     #endif
     
+#elif defined _ICONS_
+// sprite.c init
+    on_GLES2_Init_icons((int)window_width, (int)window_height);
+    printf("on_GLES2_Init\n");
+    // set viewport
+    on_GLES2_Size_icons((int)window_width, (int)window_height);
+
 #elif defined _SPRITE_
     // sprite.c init
     on_GLES2_Init_sprite((int)window_width, (int)window_height);

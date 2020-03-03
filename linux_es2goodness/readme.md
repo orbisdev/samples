@@ -59,6 +59,8 @@ linux_es2goodness # readelf -d egl_demo | grep NEEDED
 linux_es2goodness # make -f text_ani.makefile && ./egl_demo_text_ani
 
 linux_es2goodness # make -f sprite.makefile && ./egl_demo_sprite
+
+linux_es2goodness # make -f icons.makefile && ./egl_demo_icons
 ```
 
 
