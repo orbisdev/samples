@@ -108,7 +108,7 @@ static void render_text_extended( int text_num, int type_num )
         glUniformMatrix4fv( glGetUniformLocation( program, "projection" ), 1, 0, projection.data);
         glUniform4f       ( glGetUniformLocation( program, "meta"), 
                 ani->fcount,
-                ani->status /10., // we use float on SL, swtching fx state
+                ani->status /10., // we use float on SL, switching fx state
                 ani->life,
                 type_num    /10.);
 

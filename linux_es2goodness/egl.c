@@ -23,7 +23,6 @@
 #include  <GLES2/gl2.h>
 #include  <EGL/egl.h>
 
-
 #include "defines.h" // the parts list
 
 
@@ -225,6 +224,10 @@ void render()
         //UpdateScene_3(0.02);
     #endif
 
+#elif defined PL_MPEG
+    // decodes mpeg2 audiovideo
+    es2render_pl_mpeg(.03f);
+
 #elif defined _ICONS_
     /// update
     on_GLES2_Update(num_frames);
@@ -243,11 +246,16 @@ void render()
 
 #endif // now texts
 
-#if defined _FT_DEMO_
+#if defined FT_DEMO
     render_text();   // freetype demo-font.c, renders text just from init_
 
     render_text_ext(NULL);  // freetype text_ani.c, shared VBO, draw just indexed texts
     es2update_text_ani(1.f);
+
+#elif defined FT_DEMO_2
+    // demo-font_2.c init
+    render_text();
+
 #endif
 
 #if defined _SOUND_
@@ -446,7 +454,9 @@ int main(int argc, char **argv)
       printf("Unable to get uniform location\n");
       return 1;
    }
-   
+#elif defined PL_MPEG
+    // demo-font.c init
+    es2init_pl_mpeg((int)window_width, (int)window_height);
 
 #elif defined _CUBE_  
     int samples = 0;
@@ -497,7 +507,7 @@ int main(int argc, char **argv)
     on_GLES2_Size_sprite((int)window_width, (int)window_height);
 #endif 
 
-#if defined _FT_DEMO_
+#if defined FT_DEMO
     // demo-font.c init
     es2init_text((int)window_width, (int)window_height);
 
@@ -511,6 +521,11 @@ int main(int argc, char **argv)
     //reshape2((int)window_width, (int)window_height);
   #endif
    es2init_text_ani((int)window_width, (int)window_height); // text fx
+
+#elif defined FT_DEMO_2
+    // demo-font.c init
+    es2init_text((int)window_width, (int)window_height);
+
 #endif
 
    //// this is needed for time measuring  -->  frames per second
@@ -605,6 +620,9 @@ out:
 #if defined _DEMO_  
     on_GLES2_Final();
 
+#elif defined PL_MPEG
+    es2end_pl_mpeg();
+
 #elif defined _MAPI_ 
     DeleteScene_1(0);
     DeleteScene_1(1);
@@ -624,13 +642,13 @@ out:
 #elif defined _SPRITE_  
     on_GLES2_Final_sprite();
 
-#elif defined _FT_DEMO_
+#elif defined FT_DEMO
     // FT ones, sorted
     #if defined _SOUND_  
     es2fini_browser();
     #endif
-  es2fini_text_ani();
-  es2sample_end(); // demo-font.c as last one
+  	es2fini_text_ani();
+  	es2sample_end(); // demo-font.c as last one
 #endif
 
    ////  cleaning up...
@@ -639,6 +657,6 @@ out:
    eglTerminate      ( egl_display );
    XDestroyWindow    ( x_display, win );
    XCloseDisplay     ( x_display );
- 
+
    return 0;
 }

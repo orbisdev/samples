@@ -19,7 +19,7 @@ OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 CC       := clang
 CPPFLAGS := 
 CFLAGS   := -Wall -O3
-LDLIBS   := -lX11 -lEGL -lGLESv2 -lm -lfreetype -D_FT_DEMO_
+LDLIBS   := -lX11 -lEGL -lGLESv2 -lm -lfreetype -DFT_DEMO
 
 .PHONY: all clean
 
