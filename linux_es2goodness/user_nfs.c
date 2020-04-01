@@ -63,7 +63,7 @@ void user_seek(long offset, int whence)
     }
 }
 
-
+// user_read(self->bytes + self->length, bytes_available)
 size_t user_read(unsigned char *dst, size_t size)
 {
     size_t readed = nfs_pread(nfs, fh, off, size, dst);
@@ -86,10 +86,12 @@ void user_refill_buffer(unsigned char *pData, int offinFixedBuffer)
         if(count > BUFSIZE) count = BUFSIZE;
 
         count -= offinFixedBuffer;
+    //  count  = nfs_pread(nfs, fh, off, count, pData + offinFixedBuffer);
         count  = user_read(pData + offinFixedBuffer, count);
 
         if(count < 0) { fprintf(stderr, "Failed to read from file\n"); return; }
         //debugNetPrintf(DEBUG, "nfs readchunk: %lldb %db @ %p + %d\n", off, count, pData, offinFixedBuffer);
+        //off += count;
     }
 }
 
@@ -102,13 +104,13 @@ int user_init(void)
 
     int ret = 0;
 #if 0 // optional, list server exports
-    static const char *srv = "10.0.0.2";
+    static const char *srv = "192.168.1.202";
     ret = process_server(srv);
     debugNetPrintf(DEBUG, "process_server(nfs://%s): %d\n", srv, ret);
 #endif
 
     // parse url and mount export
-    url = nfs_parse_url_dir(nfs, "nfs://10.0.0.2/hostapp");
+    url = nfs_parse_url_dir(nfs, "nfs://192.168.1.202/hostapp");
     ret = nfs_mount(nfs, url->server, url->path);
     debugNetPrintf(DEBUG, "nfs_mount(%s, %s) return: %d\n", url->server, url->path, ret);
 
