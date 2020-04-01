@@ -39,7 +39,7 @@ size_t filesize;     // of nfs file
 
 int main (int argc, char **argv)
 {
-    user_init(); // nfs mount export
+    user_init(); // mount nfs export
 
     char *filename = argv[1];
 

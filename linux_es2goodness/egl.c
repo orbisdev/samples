@@ -528,6 +528,15 @@ int main(int argc, char **argv)
 
 #endif
 
+#if defined HAVE_LIBAO
+  // simulate sceAudioOut
+  ret = orbisAudioInit();                         //printf("ret: %d\n", ret); //1
+  ret = orbisAudioInitChannel(0, 1024, 48000, 1); //printf("ret: %d\n", ret); //0
+  // start audio play
+  orbisAudioResume(0);
+
+#endif
+
    //// this is needed for time measuring  -->  frames per second
    struct timezone tz;
    struct timeval  t1, t2,
@@ -649,6 +658,11 @@ out:
     #endif
   	es2fini_text_ani();
   	es2sample_end(); // demo-font.c as last one
+#endif
+
+#if defined HAVE_LIBAO
+  orbisAudioStop();
+  orbisAudioFinish();
 #endif
 
    ////  cleaning up...
